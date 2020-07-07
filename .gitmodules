@@ -1,0 +1,6 @@
+[submodule "NLWrapper"]
+	path = NLWrapper
+	url = git@github.com:ArDoCo/NLWrapper.git
+[submodule "PARSEGraphImprove"]
+	path = PARSEGraphImprove
+	url = git@github.com:ArDoCo/PARSEGraphImprove.git

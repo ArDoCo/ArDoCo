@@ -1,0 +1,42 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <artifactId>ArDoCo</artifactId>
+    <version>0.0.1</version>
+    <packaging>pom</packaging>
+    <name>ArDoCo - Architecture Documentation Consistency</name>
+    <description>ArDoCo - Architecture Documentation Consistency</description>
+    <url>https://github.com/ArDoCo/ArDoCo</url>
+
+    <issueManagement>
+        <url>https://github.com/ArDoco/ArDoCo/issues</url>
+        <system>GitHub Issues</system>
+    </issueManagement>
+
+    <parent>
+        <groupId>edu.kit.ipd</groupId>
+        <artifactId>ArDoCo-parent</artifactId>
+        <version>0.0.5</version>
+    </parent>
+
+    <repositories>
+        <repository>
+        <id>github</id>
+        <name>GitHub ArDoCo-parent Apache Maven Packages</name>
+        <url>https://maven.pkg.github.com/ArDoCo/ArDoCo-parent</url>
+        </repository>
+    </repositories>
+
+    <modules>
+        <module>NLWrapper</module>
+        <module>PARSEGraphImprove</module>
+    </modules>
+
+    <distributionManagement>
+       <repository>
+         <id>github</id>
+         <name>GitHub ArDoCo Apache Maven Packages</name>
+         <url>https://maven.pkg.github.com/ArDoCo/ArDoCo</url>
+       </repository>
+    </distributionManagement>
+</project>
