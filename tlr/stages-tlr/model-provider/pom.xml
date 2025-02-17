@@ -33,6 +33,11 @@
       <artifactId>commons-io</artifactId>
     </dependency>
     <dependency>
+      <groupId>io.github.ardoco</groupId>
+      <artifactId>magika</artifactId>
+      <version>0.6.1</version>
+    </dependency>
+    <dependency>
       <groupId>io.github.ardoco.core</groupId>
       <artifactId>common</artifactId>
       <version>${revision}</version>

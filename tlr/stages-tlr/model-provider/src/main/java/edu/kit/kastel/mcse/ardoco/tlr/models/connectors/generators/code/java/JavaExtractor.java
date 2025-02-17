@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.java;
 
 import java.io.IOException;
@@ -54,7 +54,7 @@ public final class JavaExtractor extends CodeExtractor {
 
     private static SortedMap<String, CompilationUnit> parseDirectory(Path dir) {
         ASTParser parser = getJavaParser();
-        final String[] sources = getEntries(dir, ".java");
+        final String[] sources = getJavaFiles(dir);
         final String[] encodings = new String[sources.length];
         Arrays.fill(encodings, StandardCharsets.UTF_8.toString());
         final SortedMap<String, CompilationUnit> compilationUnits = new TreeMap<>();
@@ -80,9 +80,10 @@ public final class JavaExtractor extends CodeExtractor {
         return parser;
     }
 
-    private static String[] getEntries(Path dir, String suffix) {
+    private static String[] getJavaFiles(Path dir) {
         try (Stream<Path> paths = Files.walk(dir)) {
-            return paths.filter(path -> Files.isRegularFile(path) && path.getFileName().toString().toLowerCase().endsWith(suffix))
+            return paths.filter(Files::isRegularFile)
+                    .filter(it -> fileTypePredictor.predictFileType(it).label().equals("java"))
                     .map(Path::toAbsolutePath)
                     .map(Path::normalize)
                     .map(Path::toString)

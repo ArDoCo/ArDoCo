@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.shell;
 
 import java.io.File;
@@ -29,7 +29,7 @@ public final class ShellExtractor extends CodeExtractor {
 
     private CodeModel parseCode(File file) {
         Path startingDir = Paths.get(file.toURI());
-        ShellVisitor shellScriptVisitor = new ShellVisitor(codeItemRepository, startingDir);
+        ShellVisitor shellScriptVisitor = new ShellVisitor(fileTypePredictor, codeItemRepository, startingDir);
         // walk all files and run the ShellScriptVisitor
         try {
             Files.walkFileTree(startingDir, shellScriptVisitor);

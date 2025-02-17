@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code;
 
 import static edu.kit.kastel.mcse.ardoco.core.common.JsonHandling.createObjectMapper;
@@ -16,10 +16,13 @@ import edu.kit.kastel.mcse.ardoco.core.api.models.CodeModelType;
 import edu.kit.kastel.mcse.ardoco.core.api.models.ModelType;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.CodeModel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItemRepository;
+import edu.kit.kastel.mcse.ardoco.magika.FileTypePredictor;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.Extractor;
 
 public abstract class CodeExtractor extends Extractor {
     private static final Logger logger = LoggerFactory.getLogger(CodeExtractor.class);
+
+    protected static final FileTypePredictor fileTypePredictor = new FileTypePredictor();
 
     private static final String CODE_MODEL_FILE_NAME = "codeModel.acm";
     protected final CodeItemRepository codeItemRepository;

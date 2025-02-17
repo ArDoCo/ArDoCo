@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.shell;
 
 import java.io.FileReader;
@@ -23,6 +23,7 @@ import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeCompilationUni
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItem;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItemRepository;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.ProgrammingLanguages;
+import edu.kit.kastel.mcse.ardoco.magika.FileTypePredictor;
 
 public class ShellVisitor implements FileVisitor<Path> {
     private static final Logger logger = LoggerFactory.getLogger(ShellVisitor.class);
@@ -30,8 +31,10 @@ public class ShellVisitor implements FileVisitor<Path> {
     private final Path startingDir;
     private final SortedSet<CodeItem> codeEndpoints;
     private final CodeItemRepository codeItemRepository;
+    private final FileTypePredictor fileTypePredictor;
 
-    public ShellVisitor(CodeItemRepository codeItemRepository, Path startingDir) {
+    public ShellVisitor(FileTypePredictor fileTypePredictor, CodeItemRepository codeItemRepository, Path startingDir) {
+        this.fileTypePredictor = fileTypePredictor;
         this.codeItemRepository = codeItemRepository;
         this.startingDir = startingDir;
         codeEndpoints = new TreeSet<>();
@@ -65,7 +68,7 @@ public class ShellVisitor implements FileVisitor<Path> {
         } catch (IOException e) {
             logger.warn("Exception when reading file", e);
         }
-        if (!isShellFile(fileName, code)) {
+        if (!isShellFile(code)) {
             return FileVisitResult.CONTINUE;
         }
 
@@ -90,7 +93,7 @@ public class ShellVisitor implements FileVisitor<Path> {
         return new CodeCompilationUnit(codeItemRepository, fileNameWithoutExtension, new TreeSet<>(), pathElements, extension, ProgrammingLanguages.SHELL);
     }
 
-    private static boolean isShellFile(String fileName, String code) {
-        return fileName.endsWith(".sh") || code.startsWith("#!/bin/bash") || code.startsWith("#!/bin/sh") || code.startsWith("#!/usr/bin/env bash");
+    private boolean isShellFile(String code) {
+        return fileTypePredictor.predictBytes(code.getBytes()).label().equals("shell");
     }
 }
