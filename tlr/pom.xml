@@ -81,6 +81,7 @@
     <sonar.coverage.jacoco.xmlReportPaths>${project.basedir}/../${aggregate.report.dir},
             ${project.basedir}/../../${aggregate.report.dir}</sonar.coverage.jacoco.xmlReportPaths>
     <aggregate.report.dir>report/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
+    <antlr.version>4.13.2</antlr.version>
   </properties>
 
   <dependencies>

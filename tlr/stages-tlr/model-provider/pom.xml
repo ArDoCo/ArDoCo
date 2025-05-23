@@ -43,6 +43,11 @@
       <version>${revision}</version>
     </dependency>
     <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4-runtime</artifactId>
+      <version>${antlr.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.eclipse.jdt</groupId>
       <artifactId>org.eclipse.jdt.core</artifactId>
       <version>3.36.0</version>
@@ -52,5 +57,87 @@
       <artifactId>xml-object-mapper</artifactId>
       <version>0.7.0</version>
     </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-maven-plugin</artifactId>
+        <version>${antlr.version}</version>
+        <executions>
+          <execution>
+            <!-- Compile C++ Grammar -->
+            <id>generate-cpp-parser</id>
+            <goals>
+              <goal>antlr4</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/antlr/grammar/cpp</sourceDirectory>
+              <outputDirectory>${project.basedir}/src/main/antlr-generated/edu/kit/kastel/mcse/ardoco/tlr/models/antlr4/cpp</outputDirectory>
+              <packageName>edu.kit.kastel.mcse.ardoco.tlr.models.antlr4.cpp</packageName>
+              <visitor>true</visitor>
+              <clean>true</clean>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Compile Java Grammar -->
+            <id>generate-java-parser</id>
+            <goals>
+              <goal>antlr4</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/antlr/grammar/java</sourceDirectory>
+              <outputDirectory>${project.basedir}/src/main/antlr-generated/edu/kit/kastel/mcse/ardoco/tlr/models/antlr4/java</outputDirectory>
+              <packageName>edu.kit.kastel.mcse.ardoco.tlr.models.antlr4.java</packageName>
+              <visitor>true</visitor>
+              <clean>true</clean>
+            </configuration>
+          </execution>
+          <execution>
+            <!-- Compile Python3 Grammar -->
+            <id>generate-python-parser</id>
+            <goals>
+              <goal>antlr4</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sourceDirectory>${project.basedir}/src/main/antlr/grammar/python3</sourceDirectory>
+              <outputDirectory>${project.basedir}/src/main/antlr-generated/edu/kit/kastel/mcse/ardoco/tlr/models/antlr4/python3</outputDirectory>
+              <packageName>edu.kit.kastel.mcse.ardoco.tlr.models.antlr4.python3</packageName>
+              <visitor>true</visitor>
+              <clean>true</clean>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>3.5.0</version>
+        <executions>
+          <execution>
+            <id>add-source</id>
+            <goals>
+              <goal>add-source</goal>
+            </goals>
+            <phase>generate-sources</phase>
+            <configuration>
+              <sources>
+                <source>${project.basedir}/src/main/java</source>
+                <source>${project.basedir}/src/main/antlr-generated</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

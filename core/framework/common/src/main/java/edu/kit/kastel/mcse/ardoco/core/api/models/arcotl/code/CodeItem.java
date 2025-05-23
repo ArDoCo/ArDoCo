@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code;
 
 import java.util.ArrayList;
@@ -28,6 +28,7 @@ public abstract sealed class CodeItem extends CodeEntity permits CodeModule, Com
 
     @JsonIgnore
     protected CodeItemRepository codeItemRepository;
+    protected String comment;
 
     CodeItem() {
         // Jackson
@@ -84,5 +85,13 @@ public abstract sealed class CodeItem extends CodeEntity permits CodeModule, Com
 
     public SortedSet<CodePackage> getAllPackages() {
         return new TreeSet<>();
+    }
+
+    public String getComment() {
+        return this.comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
     }
 }
