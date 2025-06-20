@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.configuration;
 
 import java.lang.reflect.Constructor;
@@ -12,6 +12,10 @@ import java.util.function.Predicate;
 import edu.kit.kastel.mcse.ardoco.core.architecture.Deterministic;
 import edu.kit.kastel.mcse.ardoco.core.data.DataRepository;
 
+/**
+ * Utility class for creating configurable objects through reflection. Provides methods to instantiate {@link AbstractConfigurable} objects with various
+ * constructor signatures.
+ */
 @Deterministic
 public final class ConfigurationInstantiatorUtils {
     private ConfigurationInstantiatorUtils() {
@@ -19,7 +23,7 @@ public final class ConfigurationInstantiatorUtils {
     }
 
     /**
-     * Create an AbstractConfigurable by Reflection.
+     * Creates an {@link AbstractConfigurable} instance by reflection, trying various constructor signatures.
      *
      * @param clazz the class of the AbstractConfigurable
      * @return the abstract configurable
@@ -30,7 +34,7 @@ public final class ConfigurationInstantiatorUtils {
     public static AbstractConfigurable createObject(Class<? extends AbstractConfigurable> clazz) throws InvocationTargetException, InstantiationException,
             IllegalAccessException {
         var constructors = Arrays.asList(clazz.getDeclaredConstructors());
-        AbstractConfigurable result = null;
+        AbstractConfigurable result;
 
         result = findAndCreate(constructors, c -> c.getParameterCount() == 0, new Object[0]);
         if (result != null) {

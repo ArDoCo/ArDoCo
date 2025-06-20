@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.tests.integration;
 
 import java.io.File;
@@ -29,12 +29,6 @@ class SadCodeTraceabilityLinkRecoveryEvaluation extends TraceabilityLinkRecovery
     public SadCodeTraceabilityLinkRecoveryEvaluation(boolean acmFile) {
         super();
         this.acmFile = acmFile;
-    }
-
-    @Override
-    protected boolean resultHasRequiredData(ArDoCoResult arDoCoResult) {
-        var traceLinks = arDoCoResult.getSadCodeTraceLinks();
-        return !traceLinks.isEmpty();
     }
 
     @Override
@@ -84,7 +78,7 @@ class SadCodeTraceabilityLinkRecoveryEvaluation extends TraceabilityLinkRecovery
         int sentences = text.getSentences().size();
 
         ModelStates modelStatesData = DataRepositoryHelper.getModelStatesData(dataRepository);
-        Model codeModel = modelStatesData.getModel(Metamodel.CODE);
+        Model codeModel = modelStatesData.getModel(Metamodel.CODE_WITH_COMPILATION_UNITS_AND_PACKAGES);
         var codeModelEndpoints = codeModel.getEndpoints().size();
 
         return sentences * codeModelEndpoints;

@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.text.providers.informants.corenlp;
 
 import java.io.IOException;
@@ -19,6 +19,8 @@ import edu.stanford.nlp.pipeline.CoreDocument;
 
 public class TextImpl implements Text {
 
+    @Serial
+    private static final long serialVersionUID = 8720058979625513977L;
     private transient CoreDocument coreDocument;
     private ImmutableList<Sentence> sentences = Lists.immutable.empty();
     private ImmutableList<Word> words = Lists.immutable.empty();

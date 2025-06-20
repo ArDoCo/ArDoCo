@@ -1,17 +1,16 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.codetraceability.informants.arcotl.computation;
 
 import java.util.Set;
 
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureModel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.CodeModel;
-import edu.kit.kastel.mcse.ardoco.core.api.tracelink.SamCodeTraceLink;
+import edu.kit.kastel.mcse.ardoco.core.api.stage.codetraceability.ModelCodeTraceLink;
 import edu.kit.kastel.mcse.ardoco.core.architecture.Deterministic;
 import edu.kit.kastel.mcse.ardoco.tlr.codetraceability.informants.arcotl.computation.computationtree.Node;
 
 /**
- * A computation. Calculates the {@link Confidence confidences} and trace links
- * for a computation tree.
+ * A computation. Calculates the {@link Confidence confidences} and trace links for a computation tree.
  */
 @Deterministic
 public class Computation {
@@ -41,14 +40,12 @@ public class Computation {
     }
 
     /**
-     * Returns the trace links that this computation has calculated. The
-     * computation's tree root's result maps all endpoint tuples to a confidence.
-     * Every endpoint tuple whose confidence has a value gets returned.
+     * Returns the trace links that this computation has calculated. The computation's tree root's result maps all endpoint tuples to a confidence. Every
+     * endpoint tuple whose confidence has a value gets returned.
      *
-     * @return trace links for every endpoint tuple whose confidence in the root's
-     *         result has a value
+     * @return trace links for every endpoint tuple whose confidence in the root's result has a value
      */
-    public Set<SamCodeTraceLink> getTraceLinks() {
+    public Set<ModelCodeTraceLink> getTraceLinks() {
         return result.getTraceLinks(root);
     }
 }

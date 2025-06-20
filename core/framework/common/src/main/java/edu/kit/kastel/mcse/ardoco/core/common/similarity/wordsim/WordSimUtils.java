@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim;
 
 import java.util.ArrayList;
@@ -18,11 +18,8 @@ import edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.strategy.Compar
 import edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.strategy.SimilarityStrategy;
 
 /**
- * A static class that provides various utility methods to calculate similarity between different kinds of objects. This class statically keeps a reference to a
- * fallback {@link ComparisonStrategy} and a fallback list of word similarity measures. These fallbacks can be changed with the {@link #setMeasures(Collection)}
- * and {@link #setStrategy(ComparisonStrategy)} methods. Any calls to methods that provide their own measures or strategies will not utilize these fallbacks.
- * Any calls that do not provide their own measures or strategies will utilize them. As of right now, no protections against simultaneous write access from
- * multiple threads exist. Therefore, this class is not threadsafe.
+ * Provides utility methods for calculating similarity between objects, with configurable strategies and measures.
+ * Not thread-safe.
  */
 public class WordSimUtils {
 
@@ -31,7 +28,7 @@ public class WordSimUtils {
     private SimilarityStrategy similarityStrategy = new AverageStrategy();
 
     /**
-     * Sets which measures should be used for similarity comparison. The specified collection of measures will be used for all subsequent comparisons.
+     * Sets which measures should be used for similarity comparison.
      *
      * @param measures the measures to use
      */
@@ -40,10 +37,10 @@ public class WordSimUtils {
     }
 
     /**
-     * Adds the specified measure to the measures, which should be used for similarity comparison.
+     * Adds the specified measure to the measures used for similarity comparison.
      *
      * @param measure the measure to add
-     * @return Whether the measure was added successfully
+     * @return true if the measure was added successfully
      */
     public boolean addMeasure(WordSimMeasure measure) {
         return this.measures.add(measure);
@@ -72,13 +69,12 @@ public class WordSimUtils {
      *
      * @param ctx      the context
      * @param strategy the strategy
-     * @return Returns {@code true} if the given strategy considers the words similar enough.
+     * @return true if the given strategy considers the words similar enough
      */
     public boolean areWordsSimilar(ComparisonContext ctx, ComparisonStrategy strategy) {
         Objects.requireNonNull(ctx);
         Objects.requireNonNull(strategy);
 
-        // Currently, we need the split test as it improves results by a lot. In the future, we should try to avoid its requirement
         if (!this.splitLengthTest(ctx)) {
             return false;
         }
@@ -93,11 +89,10 @@ public class WordSimUtils {
     }
 
     /**
-     * Evaluates whether the words from the given {@link ComparisonContext} are similar using the default comparison strategy. The default strategy can be
-     * changed with the {@link #setStrategy(ComparisonStrategy)} method.
+     * Evaluates whether the words from the given {@link ComparisonContext} are similar using the default comparison strategy.
      *
      * @param ctx the context
-     * @return Returns {@code true} if the default strategy considers the words similar enough.
+     * @return true if the default strategy considers the words similar enough
      */
     public boolean areWordsSimilar(ComparisonContext ctx) {
         Objects.requireNonNull(ctx);
@@ -105,12 +100,11 @@ public class WordSimUtils {
     }
 
     /**
-     * Evaluates whether the given words are similar using the default comparison strategy. The default strategy can be changed with the
-     * {@link #setStrategy(ComparisonStrategy)} method.
+     * Evaluates whether the given words are similar using the default comparison strategy.
      *
      * @param firstWord  the first word
      * @param secondWord the second word
-     * @return Returns {@code true} if the default strategy considers the words similar enough.
+     * @return true if the default strategy considers the words similar enough
      */
     public boolean areWordsSimilar(String firstWord, String secondWord) {
         return this.areWordsSimilar(new ComparisonContext(firstWord, secondWord, false), this.strategy);
@@ -122,19 +116,18 @@ public class WordSimUtils {
      * @param firstWord  the first word
      * @param secondWord the second word
      * @param strategy   the strategy to use
-     * @return Returns {@code true} if the given strategy considers the words similar enough.
+     * @return true if the given strategy considers the words similar enough
      */
     public boolean areWordsSimilar(String firstWord, String secondWord, ComparisonStrategy strategy) {
         return this.areWordsSimilar(new ComparisonContext(firstWord, secondWord, false), strategy);
     }
 
     /**
-     * Evaluates whether the given words are similar using the default comparison strategy. The default strategy can be changed with the
-     * {@link #setStrategy(ComparisonStrategy)} method.
+     * Evaluates whether the given words are similar using the default comparison strategy.
      *
      * @param firstWord  the first word
      * @param secondWord the second word
-     * @return Returns {@code true} if the default strategy considers the words similar enough.
+     * @return true if the default strategy considers the words similar enough
      */
     public boolean areWordsSimilar(Word firstWord, Word secondWord) {
         return this.areWordsSimilar(new ComparisonContext(firstWord, secondWord, false), this.strategy);
@@ -146,19 +139,18 @@ public class WordSimUtils {
      * @param firstWord  the first word
      * @param secondWord the second word
      * @param strategy   the strategy to use
-     * @return Returns {@code true} if the given strategy considers the words similar enough.
+     * @return true if the given strategy considers the words similar enough
      */
     public boolean areWordsSimilar(Word firstWord, Word secondWord, ComparisonStrategy strategy) {
         return this.areWordsSimilar(new ComparisonContext(firstWord, secondWord, false), strategy);
     }
 
     /**
-     * Evaluates whether the given words are similar using the default comparison strategy. The default strategy can be changed with the
-     * {@link #setStrategy(ComparisonStrategy)} method.
+     * Evaluates whether the given words are similar using the default comparison strategy.
      *
      * @param firstWord  the first word
      * @param secondWord the second word
-     * @return Returns {@code true} if the default strategy considers the words similar enough.
+     * @return true if the default strategy considers the words similar enough
      */
     public boolean areWordsSimilar(String firstWord, Word secondWord) {
         return this.areWordsSimilar(new ComparisonContext(firstWord, secondWord.getText(), null, secondWord, false), this.strategy);
@@ -170,7 +162,7 @@ public class WordSimUtils {
      * @param firstWord  the first word
      * @param secondWord the second word
      * @param strategy   the strategy to use
-     * @return Returns {@code true} if the given strategy considers the words similar enough.
+     * @return true if the given strategy considers the words similar enough
      */
     public boolean areWordsSimilar(String firstWord, Word secondWord, ComparisonStrategy strategy) {
         return this.areWordsSimilar(new ComparisonContext(firstWord, secondWord.getText(), null, secondWord, false), strategy);
@@ -183,7 +175,7 @@ public class WordSimUtils {
      * @param secondWord the second word
      * @param strategy   the strategy to use
      * @param ignoreCase whether to ignore the case during comparison
-     * @return Returns similarity in range [0,1]
+     * @return similarity in range [0,1]
      */
     public double getSimilarity(String firstWord, String secondWord, SimilarityStrategy strategy, boolean ignoreCase) {
         var allMeasuresExceptDefault = this.measures.stream().filter(m -> !(m instanceof EqualityMeasure)).collect(Collectors.toCollection(ArrayList::new));
@@ -201,7 +193,7 @@ public class WordSimUtils {
      *
      * @param firstWord  the first word
      * @param secondWord the second word
-     * @return Returns similarity in range [0,1]
+     * @return similarity in range [0,1]
      */
     public double getSimilarity(String firstWord, String secondWord) {
         return this.getSimilarity(firstWord, secondWord, false);
@@ -213,12 +205,17 @@ public class WordSimUtils {
      * @param firstWord  the first word
      * @param secondWord the second word
      * @param ignoreCase whether to ignore the case during comparison
-     * @return Returns similarity in range [0,1]
+     * @return similarity in range [0,1]
      */
     public double getSimilarity(String firstWord, String secondWord, boolean ignoreCase) {
         return this.getSimilarity(firstWord, secondWord, this.similarityStrategy, ignoreCase);
     }
 
+    /**
+     * Configures SQLite settings for read-only, exclusive locking, and no journal mode.
+     *
+     * @return configured SQLiteConfig instance
+     */
     public static SQLiteConfig getSqLiteConfig() {
         var cfg = new SQLiteConfig();
         cfg.setReadOnly(true);

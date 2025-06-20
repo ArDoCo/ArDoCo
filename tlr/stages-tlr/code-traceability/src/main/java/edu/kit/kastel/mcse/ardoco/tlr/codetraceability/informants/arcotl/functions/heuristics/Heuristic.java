@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.codetraceability.informants.arcotl.functions.heuristics;
 
 import org.slf4j.Logger;
@@ -40,14 +40,14 @@ public abstract class Heuristic {
 
     protected Confidence calculateConfidence(ArchitectureComponent archComponent, CodeCompilationUnit compUnit) {
         if (archComponent == null || compUnit == null) {
-            logger.warn("null values when calculating confidence");
+            logger.warn("null values when calculating confidence (component)");
         }
         return new Confidence();
     }
 
     protected Confidence calculateConfidence(ArchitectureInterface archInterface, CodeCompilationUnit compUnit) {
         if (archInterface == null || compUnit == null) {
-            logger.warn("null values when calculating confidence");
+            logger.warn("null values when calculating confidence (interface)");
         }
         return new Confidence();
     }

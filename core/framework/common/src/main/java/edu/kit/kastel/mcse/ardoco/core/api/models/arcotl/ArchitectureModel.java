@@ -1,57 +1,28 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.models.arcotl;
 
 import java.util.List;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.ArchitectureItem;
 
 /**
- * An architecture model that is an AMTL instance.
+ * Represents an architecture model that is an AMTL instance.
  */
-public final class ArchitectureModel extends Model {
-
-    private final List<ArchitectureItem> content;
+public abstract sealed class ArchitectureModel extends Model permits ArchitectureComponentModel, ArchitectureModelWithComponentsAndInterfaces {
 
     /**
-     * Creates a new architecture model that is an AMTL instance. The model has the
-     * specified architecture items as content.
+     * Returns the content of the architecture model.
      *
-     * @param content the content of the architecture model
+     * @return list of architecture items
      */
-    public ArchitectureModel(List<ArchitectureItem> content) {
-        this.content = content;
-    }
-
     @Override
-    public List<ArchitectureItem> getContent() {
-        return this.content;
-    }
+    public abstract List<? extends ArchitectureItem> getContent();
 
+    /**
+     * Returns the endpoints of this model.
+     *
+     * @return list of architecture items
+     */
     @Override
-    public List<ArchitectureItem> getEndpoints() {
-        return this.getContent();
-    }
-
-    @Override
-    public Metamodel getMetamodel() {
-        return Metamodel.ARCHITECTURE;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (!(o instanceof ArchitectureModel that) || !super.equals(o)) {
-            return false;
-        }
-        return this.content.equals(that.content);
-    }
-
-    @Override
-    public int hashCode() {
-        int result = super.hashCode();
-        return 31 * result + this.content.hashCode();
-    }
+    public abstract List<? extends ArchitectureItem> getEndpoints();
 }

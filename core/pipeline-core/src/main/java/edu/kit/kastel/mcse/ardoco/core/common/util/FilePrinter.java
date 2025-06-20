@@ -1,4 +1,4 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.util;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -25,7 +25,7 @@ import edu.kit.kastel.mcse.ardoco.core.api.stage.inconsistency.ModelInconsistenc
 import edu.kit.kastel.mcse.ardoco.core.architecture.Deterministic;
 
 /**
- * The Class FilePrinter contains some helpers for stats.
+ * The FilePrinter class contains utility methods for writing output files and statistics.
  */
 @Deterministic
 public final class FilePrinter {
@@ -39,7 +39,8 @@ public final class FilePrinter {
     }
 
     /**
-     * Writes the given text to the file with the given name/path. Truncates existing files, creates the file if not existent and writes in UTF-8.
+     * Writes the given text to the file with the specified name/path. Truncates existing files, creates the file if it doesn't exist, and writes in UTF-8
+     * encoding.
      *
      * @param filename the name/path of the file
      * @param text     the text to write
@@ -50,7 +51,7 @@ public final class FilePrinter {
     }
 
     /**
-     * Writes the given text to the given file (as path). Truncates existing files, creates the file if not existent and writes in UTF-8.
+     * Writes the given text to the specified file path. Truncates existing files, creates the file if it doesn't exist, and writes in UTF-8 encoding.
      *
      * @param file the path of the file
      * @param text the text to write
@@ -64,6 +65,12 @@ public final class FilePrinter {
         }
     }
 
+    /**
+     * Writes inconsistency output to the specified file. Includes both inconsistent sentences and model inconsistencies.
+     *
+     * @param file         the file to write the inconsistency output to
+     * @param arDoCoResult the ArDoCo result containing inconsistency data
+     */
     public static void writeInconsistencyOutput(File file, ArDoCoResult arDoCoResult) {
         MutableList<String> allInconsistencies = Lists.mutable.empty();
         allInconsistencies.addAll(arDoCoResult.getInconsistentSentences().collect(InconsistentSentence::getInfoString).toList());
@@ -72,6 +79,12 @@ public final class FilePrinter {
         writeOutput(file, "Inconsistencies", outputExtractor);
     }
 
+    /**
+     * Writes traceability link recovery output to the specified file.
+     *
+     * @param file         the file to write the traceability link output to
+     * @param arDoCoResult the ArDoCo result containing trace link data
+     */
     public static void writeTraceabilityLinkRecoveryOutput(File file, ArDoCoResult arDoCoResult) {
         Supplier<List<String>> outputExtractor = arDoCoResult::getAllTraceLinksAsBeautifiedStrings;
         writeOutput(file, "Trace Links", outputExtractor);
@@ -90,11 +103,17 @@ public final class FilePrinter {
         writeToFile(file.toPath(), outputBuilder.toString());
     }
 
+    /**
+     * Writes trace links as Comma-Separated Values files to the specified output directory. Creates separate files for different types of trace links.
+     *
+     * @param arDoCoResult the ArDoCo result containing trace link data
+     * @param outputDir    the directory where Comma-Separated Values files should be written
+     */
     public static void writeTraceLinksAsCsv(ArDoCoResult arDoCoResult, File outputDir) {
         String name = arDoCoResult.getProjectName();
         String header;
 
-        var sadSamTls = Lists.immutable.ofAll(arDoCoResult.getAllTraceLinks());
+        var sadSamTls = Lists.immutable.ofAll(arDoCoResult.getArchitectureTraceLinks());
         if (!sadSamTls.isEmpty()) {
             var sadSamTlr = outputDir.toPath().resolve("sadSamTlr_" + name + ".csv");
             header = "modelElementID,sentence";
@@ -130,7 +149,7 @@ public final class FilePrinter {
                 Files.writeString(filePath, traceLink + System.lineSeparator(), StandardOpenOption.APPEND);
             }
         } catch (IOException e) {
-            logger.warn("An exception occurred when writing trace links to CSV file.", e);
+            logger.warn("An exception occurred when writing trace links to Comma-Separated Values file.", e);
         }
     }
 

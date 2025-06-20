@@ -1,11 +1,5 @@
 # ArDoCo
 
-[![Maven Verify](https://github.com/ArDoCo/Core/actions/workflows/verify.yml/badge.svg)](https://github.com/ArDoCo/Core/actions/workflows/verify.yml)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/io.github.ardoco.core/parent/badge.svg)](https://maven-badges.herokuapp.com/maven-central/io.github.ardoco.core/parent)
-[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=ArDoCo_Core&metric=alert_status)](https://sonarcloud.io/dashboard?id=ArDoCo_Core)
-[![Latest Release](https://img.shields.io/github/release/ArDoCo/Core.svg)](https://github.com/ArDoCo/Core/releases/latest)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7274034.svg)](https://doi.org/10.5281/zenodo.7274034)
-
 The goal of the ArDoCo project is to connect architecture documentation and models with Traceability Link Recovery (TLR) while identifying missing or deviating elements (inconsistencies).
 An element can be any representable item of the model, like a component or a relation.
 To do so, we first create trace links and then make use of them and other information to identify inconsistencies.
@@ -28,24 +22,6 @@ For more information about the setup, the project structure, or the architecture
 		<version>VERSION</version>
 	</dependency>
 </dependencies>
-```
-
-For snapshot releases, make sure to add the following repository
-
-```xml
-
-<repositories>
-	<repository>
-		<releases>
-			<enabled>false</enabled>
-		</releases>
-		<snapshots>
-			<enabled>true</enabled>
-		</snapshots>
-		<id>mavenSnapshot</id>
-		<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-	</repository>
-</repositories>
 ```
 
 ## Relevant repositories

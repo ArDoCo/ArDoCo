@@ -1,9 +1,9 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.id.types;
 
 import org.junit.jupiter.api.BeforeEach;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.legacy.ModelInstanceImpl;
+import edu.kit.kastel.mcse.ardoco.core.api.entity.ArchitectureEntityImpl;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.inconsistency.Inconsistency;
 
 class NameInconsistencyTest extends AbstractInconsistencyTypeTest {
@@ -12,7 +12,7 @@ class NameInconsistencyTest extends AbstractInconsistencyTypeTest {
 
     @BeforeEach
     void beforeEach() {
-        nameInconsistency = new NameInconsistency(new ModelInstanceImpl("Dummy", "BasicComponent", "1"), new DummyWord());
+        nameInconsistency = new NameInconsistency(new ArchitectureEntityImpl("Dummy", "BasicComponent", "1"), new DummyWord());
     }
 
     @Override
@@ -32,12 +32,12 @@ class NameInconsistencyTest extends AbstractInconsistencyTypeTest {
 
     @Override
     protected Inconsistency getUnequalInconsistency() {
-        return new NameInconsistency(new ModelInstanceImpl("DummyComposite", "CompositeComponent", "2"), new DummyWord());
+        return new NameInconsistency(new ArchitectureEntityImpl("DummyComposite", "CompositeComponent", "2"), new DummyWord());
     }
 
     @Override
     protected Inconsistency getEqualInconsistency() {
-        return new NameInconsistency(new ModelInstanceImpl("Dummy", "BasicComponent", "1"), new DummyWord());
+        return new NameInconsistency(new ArchitectureEntityImpl("Dummy", "BasicComponent", "1"), new DummyWord());
     }
 
     @Override

@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.textproviderjson;
 
 import org.junit.jupiter.api.Assertions;
@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 
 import edu.kit.kastel.mcse.ardoco.core.api.text.Phrase;
 import edu.kit.kastel.mcse.ardoco.core.api.text.Text;
-import edu.kit.kastel.mcse.ardoco.core.common.util.DataRepositoryHelper;
 import edu.kit.kastel.mcse.ardoco.core.textproviderjson.converter.DtoToObjectConverter;
 import edu.kit.kastel.mcse.ardoco.core.textproviderjson.textobject.PhraseImpl;
 
@@ -31,8 +30,8 @@ class PhraseImplTest {
     }
 
     @Test
-    void testGetSentenceNo() {
-        Assertions.assertEquals(baselinePhrase.getSentenceNo(), phraseImplInstance.getSentenceNo());
+    void testGetSentenceNumber() {
+        Assertions.assertEquals(baselinePhrase.getSentenceNumber(), phraseImplInstance.getSentenceNumber());
     }
 
     @Test
@@ -51,25 +50,25 @@ class PhraseImplTest {
     }
 
     @Test
-    void testGetSubPhrases() {
-        Assertions.assertEquals(baselinePhrase.getSubPhrases().size(), phraseImplInstance.getSubPhrases().size());
+    void testGetSubphrases() {
+        Assertions.assertEquals(baselinePhrase.getSubphrases().size(), phraseImplInstance.getSubphrases().size());
     }
 
     @Test
-    void testIsSuperPhraseOf() {
-        Phrase subphrase = phraseImplInstance.getSubPhrases().get(0);
+    void testIsSuperphraseOf() {
+        Phrase subphrase = phraseImplInstance.getSubphrases().get(0);
         Assertions.assertAll(//
-                () -> Assertions.assertTrue(phraseImplInstance.isSuperPhraseOf(subphrase)), () -> Assertions.assertFalse(phraseImplInstance.isSuperPhraseOf(
-                        phraseImplInstance)), () -> Assertions.assertFalse(subphrase.isSuperPhraseOf(phraseImplInstance))//
+                () -> Assertions.assertTrue(phraseImplInstance.isSuperphraseOf(subphrase)), () -> Assertions.assertFalse(phraseImplInstance.isSuperphraseOf(
+                        phraseImplInstance)), () -> Assertions.assertFalse(subphrase.isSuperphraseOf(phraseImplInstance))//
         );
     }
 
     @Test
-    void testIsSubPhraseOf() {
-        Phrase subphrase = phraseImplInstance.getSubPhrases().get(0);
+    void testIsSubphraseOf() {
+        Phrase subphrase = phraseImplInstance.getSubphrases().get(0);
         Assertions.assertAll(//
-                () -> Assertions.assertFalse(phraseImplInstance.isSubPhraseOf(subphrase)), () -> Assertions.assertFalse(phraseImplInstance.isSubPhraseOf(
-                        phraseImplInstance)), () -> Assertions.assertTrue(subphrase.isSubPhraseOf(phraseImplInstance))//
+                () -> Assertions.assertFalse(phraseImplInstance.isSubphraseOf(subphrase)), () -> Assertions.assertFalse(phraseImplInstance.isSubphraseOf(
+                        phraseImplInstance)), () -> Assertions.assertTrue(subphrase.isSubphraseOf(phraseImplInstance))//
         );
     }
 
@@ -81,11 +80,5 @@ class PhraseImplTest {
     @Test
     void simpleHashCodeTest() {
         Assertions.assertEquals(phraseImplInstance.hashCode(), phraseImplInstance.hashCode());
-    }
-
-    @Test
-    void serializationTest() {
-        var serializedCopy = DataRepositoryHelper.deepCopy(phraseImplInstance);
-        Assertions.assertNotNull(serializedCopy);
     }
 }

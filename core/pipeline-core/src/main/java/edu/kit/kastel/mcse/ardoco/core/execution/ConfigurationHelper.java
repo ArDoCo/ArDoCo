@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.execution;
 
 import java.io.File;
@@ -34,10 +34,10 @@ public class ConfigurationHelper {
     }
 
     /**
-     * Loads the file that contains additional configurations and returns the Map that consists of the configuration options.
+     * Loads a file containing additional configurations and returns a map of configuration options.
      *
      * @param additionalConfigsFile the file containing the additional configurations
-     * @return a Map with the additional configurations
+     * @return a map with the additional configurations
      */
     public static SortedMap<String, String> loadAdditionalConfigs(File additionalConfigsFile) {
         SortedMap<String, String> additionalConfigs = new TreeMap<>();
@@ -69,6 +69,11 @@ public class ConfigurationHelper {
         return additionalConfigs;
     }
 
+    /**
+     * Returns a map containing all default configuration options for all configurable classes in the ArDoCo framework.
+     *
+     * @return a map with all default configuration options
+     */
     public static Map<String, String> getDefaultConfigurationOptions() {
         Map<String, String> configs = new TreeMap<>();
         var reflectAccess = new Reflections("edu.kit.kastel.mcse.ardoco");
@@ -88,6 +93,15 @@ public class ConfigurationHelper {
         return configs;
     }
 
+    /**
+     * Processes the configuration of a specific class by creating an instance and extracting all configurable fields.
+     *
+     * @param configs the map to store configuration options in
+     * @param clazz   the class to process
+     * @throws InvocationTargetException if the constructor cannot be invoked
+     * @throws InstantiationException    if the class cannot be instantiated
+     * @throws IllegalAccessException    if access to fields is denied
+     */
     protected static void processConfigurationOfClass(Map<String, String> configs, Class<? extends AbstractConfigurable> clazz)
             throws InvocationTargetException, InstantiationException, IllegalAccessException {
         var object = ConfigurationInstantiatorUtils.createObject(clazz);

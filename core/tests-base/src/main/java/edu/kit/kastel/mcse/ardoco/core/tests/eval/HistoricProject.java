@@ -1,4 +1,4 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.core.tests.eval;
 
 import java.io.File;
@@ -16,8 +16,8 @@ import org.eclipse.collections.api.list.MutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.ArchitectureModelType;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureModel;
+import edu.kit.kastel.mcse.ardoco.core.api.models.ModelFormat;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureComponentModel;
 import edu.kit.kastel.mcse.ardoco.core.execution.ConfigurationHelper;
 import edu.kit.kastel.mcse.ardoco.core.tests.eval.results.ExpectedResults;
 
@@ -107,20 +107,22 @@ public enum HistoricProject implements GoldStandardProject {
     }
 
     @Override
-    public File getModelFile(ArchitectureModelType modelType) {
+    public File getModelFile(ModelFormat modelType) {
         return switch (modelType) {
             case PCM -> getModelFile();
             case UML -> ProjectHelper.loadFileFromResources(model.replace("/pcm/", "/uml/").replace(".repository", ".uml"));
             case RAW -> throw new IllegalArgumentException("Raw model is not supported for this project.");
+            case ACM -> throw new IllegalArgumentException("ACM model is not supported for this project.");
         };
     }
 
     @Override
-    public String getModelResourceName(ArchitectureModelType modelType) {
+    public String getModelResourceName(ModelFormat modelType) {
         return switch (modelType) {
             case PCM -> model;
             case UML -> model.replace("/pcm/", "/uml/").replace(".repository", ".uml");
             case RAW -> throw new IllegalArgumentException("Raw model is not supported for this project.");
+            case ACM -> throw new IllegalArgumentException("ACM model is not supported for this project.");
         };
     }
 
@@ -174,8 +176,8 @@ public enum HistoricProject implements GoldStandardProject {
     }
 
     @Override
-    public GoldStandard getTlrGoldStandard(ArchitectureModel architectureModel) {
-        return new GoldStandard(getTlrGoldStandardFile(), architectureModel);
+    public GoldStandard getTlrGoldStandard(ArchitectureComponentModel architectureComponentModel) {
+        return new GoldStandard(getTlrGoldStandardFile(), architectureComponentModel);
     }
 
     @Override

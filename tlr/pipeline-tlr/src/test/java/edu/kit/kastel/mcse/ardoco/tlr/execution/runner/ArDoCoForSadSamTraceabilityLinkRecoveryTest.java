@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.execution.runner;
 
 import java.io.File;
@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.ArchitectureModelType;
-import edu.kit.kastel.mcse.ardoco.tlr.execution.ArDoCoForSadSamTraceabilityLinkRecovery;
+import edu.kit.kastel.mcse.ardoco.core.api.models.ModelFormat;
 import edu.kit.kastel.mcse.ardoco.core.execution.ConfigurationHelper;
 import edu.kit.kastel.mcse.ardoco.core.execution.RunnerBaseTest;
+import edu.kit.kastel.mcse.ardoco.tlr.execution.ArDoCoForSadSamTraceabilityLinkRecovery;
 
 @Disabled("Disabled as other (integration) tests cover the same functionality. Enable for debugging/local development.")
 class ArDoCoForSadSamTraceabilityLinkRecoveryTest extends RunnerBaseTest {
@@ -21,7 +21,7 @@ class ArDoCoForSadSamTraceabilityLinkRecoveryTest extends RunnerBaseTest {
     void testSadSamTlrPcm() {
         var runner = new ArDoCoForSadSamTraceabilityLinkRecovery(projectName);
         var additionalConfigsMap = ConfigurationHelper.loadAdditionalConfigs(new File(additionalConfigs));
-        runner.setUp(inputText, inputModelArchitecture, ArchitectureModelType.PCM, additionalConfigsMap, outputDir);
+        runner.setUp(inputText, inputModelArchitecture, ModelFormat.PCM, additionalConfigsMap, outputDir);
 
         testRunnerAssertions(runner);
         Assertions.assertNotNull(runner.run());
@@ -33,7 +33,7 @@ class ArDoCoForSadSamTraceabilityLinkRecoveryTest extends RunnerBaseTest {
     void testSadSamTlrUml() {
         var runner = new ArDoCoForSadSamTraceabilityLinkRecovery(projectName);
         var additionalConfigsMap = ConfigurationHelper.loadAdditionalConfigs(new File(additionalConfigs));
-        runner.setUp(inputText, inputModelArchitectureUml, ArchitectureModelType.UML, additionalConfigsMap, outputDir);
+        runner.setUp(inputText, inputModelArchitectureUml, ModelFormat.UML, additionalConfigsMap, outputDir);
 
         testRunnerAssertions(runner);
         Assertions.assertNotNull(runner.run());

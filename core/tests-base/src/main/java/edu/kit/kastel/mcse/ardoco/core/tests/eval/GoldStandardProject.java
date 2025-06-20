@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.tests.eval;
 
 import java.io.File;
@@ -15,8 +15,8 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 import org.slf4j.LoggerFactory;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.ArchitectureModelType;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureModel;
+import edu.kit.kastel.mcse.ardoco.core.api.models.ModelFormat;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureComponentModel;
 import edu.kit.kastel.mcse.ardoco.core.tests.eval.results.ExpectedResults;
 
 /**
@@ -99,7 +99,7 @@ public interface GoldStandardProject {
      * @param modelType the model type
      * @return the File that represents the model for this project
      */
-    default File getModelFile(ArchitectureModelType modelType) {
+    default File getModelFile(ModelFormat modelType) {
         return this.getProjectOrThrow().getModelFile(modelType);
     }
 
@@ -108,7 +108,7 @@ public interface GoldStandardProject {
      *
      * @param modelType the model type
      */
-    default String getModelResourceName(ArchitectureModelType modelType) {
+    default String getModelResourceName(ModelFormat modelType) {
         return this.getProjectOrThrow().getModelResourceName(modelType);
     }
 
@@ -181,11 +181,11 @@ public interface GoldStandardProject {
     /**
      * Returns the {@link GoldStandard} for this project for the given model connector.
      *
-     * @param architectureModel the model
+     * @param architectureComponentModel the model
      * @return the {@link GoldStandard} for this project
      */
-    default GoldStandard getTlrGoldStandard(ArchitectureModel architectureModel) {
-        return this.getProjectOrThrow().getTlrGoldStandard(architectureModel);
+    default GoldStandard getTlrGoldStandard(ArchitectureComponentModel architectureComponentModel) {
+        return this.getProjectOrThrow().getTlrGoldStandard(architectureComponentModel);
     }
 
     default MutableList<String> getMissingTextForModelElementGoldStandard() {

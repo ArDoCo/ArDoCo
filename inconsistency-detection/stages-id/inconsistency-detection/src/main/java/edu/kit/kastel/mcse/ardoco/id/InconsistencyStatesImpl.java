@@ -1,6 +1,7 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.id;
 
+import java.io.Serial;
 import java.util.EnumMap;
 
 import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
@@ -8,6 +9,8 @@ import edu.kit.kastel.mcse.ardoco.core.api.stage.inconsistency.InconsistencyStat
 import edu.kit.kastel.mcse.ardoco.core.api.stage.inconsistency.InconsistencyStates;
 
 public class InconsistencyStatesImpl implements InconsistencyStates {
+    @Serial
+    private static final long serialVersionUID = 5683120566268132355L;
     private EnumMap<Metamodel, InconsistencyStateImpl> inconsistencyStates;
 
     private InconsistencyStatesImpl() {
@@ -23,7 +26,7 @@ public class InconsistencyStatesImpl implements InconsistencyStates {
     }
 
     @Override
-    public InconsistencyState getInconsistencyState(Metamodel mm) {
-        return inconsistencyStates.get(mm);
+    public InconsistencyState getInconsistencyState(Metamodel metamodel) {
+        return inconsistencyStates.get(metamodel);
     }
 }

@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.text.providers.base;
 
 import org.junit.jupiter.api.Assertions;
@@ -44,8 +44,8 @@ public abstract class WordTest {
     }
 
     @Test
-    void getSentenceNoTest() {
-        Assertions.assertEquals(41, word.getSentenceNo());
+    void getSentenceNumberTest() {
+        Assertions.assertEquals(41, word.getSentenceNumber());
     }
 
     @Test

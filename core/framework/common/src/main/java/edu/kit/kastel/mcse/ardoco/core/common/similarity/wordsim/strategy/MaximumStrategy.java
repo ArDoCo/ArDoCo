@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.strategy;
 
 import java.util.List;
@@ -6,6 +6,9 @@ import java.util.List;
 import edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.ComparisonContext;
 import edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.WordSimMeasure;
 
+/**
+ * A similarity strategy that returns the maximum of all similarity scores from the provided word similarity measures.
+ */
 public class MaximumStrategy implements SimilarityStrategy {
     @Override
     public double getSimilarity(ComparisonContext ctx, List<WordSimMeasure> measures) {

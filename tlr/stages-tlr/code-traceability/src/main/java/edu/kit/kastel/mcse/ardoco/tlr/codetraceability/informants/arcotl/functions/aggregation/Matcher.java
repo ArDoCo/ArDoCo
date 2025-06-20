@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.codetraceability.informants.arcotl.functions.aggregation;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public abstract class Matcher extends Aggregation {
         }
     }
 
-    private EndpointType endpointTypeToMatch;
+    private final EndpointType endpointTypeToMatch;
 
     protected Matcher(EndpointType endpointsToUse) {
         this.endpointTypeToMatch = endpointsToUse;
@@ -35,8 +35,8 @@ public abstract class Matcher extends Aggregation {
     public NodeResult calculateConfidences(ArchitectureModel archModel, CodeModel codeModel, List<NodeResult> childrenResults) {
         NodeResult matchResult = new NodeResult(archModel, codeModel);
         List<? extends Entity> endpoints = switch (endpointTypeToMatch) {
-        case ARCHITECTURE -> archModel.getEndpoints();
-        case CODE -> codeModel.getEndpoints();
+            case ARCHITECTURE -> archModel.getEndpoints();
+            case CODE -> codeModel.getEndpoints();
         };
         for (Entity endpointToMatch : endpoints) {
             NodeResult partialMatchResult = matchEndpoint(endpointToMatch, childrenResults);

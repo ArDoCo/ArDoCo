@@ -1,15 +1,16 @@
-/* Licensed under MIT 2024. */
+/* Licensed under MIT 2024-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.models.agents;
 
 import java.io.File;
 import java.util.List;
 
+import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItemRepository;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.Extractor;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.AllLanguagesExtractor;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.CodeExtractor;
 
-public record CodeConfiguration(File code, CodeConfigurationType type) {
+public record CodeConfiguration(File code, CodeConfigurationType type, Metamodel metamodel) {
 
     public CodeConfiguration {
         if (code == null || type == null) {
@@ -32,7 +33,7 @@ public record CodeConfiguration(File code, CodeConfigurationType type) {
     public List<Extractor> extractors() {
         if (this.type == CodeConfigurationType.DIRECTORY) {
             CodeItemRepository codeItemRepository = new CodeItemRepository();
-            CodeExtractor codeExtractor = new AllLanguagesExtractor(codeItemRepository, this.code.getAbsolutePath());
+            CodeExtractor codeExtractor = new AllLanguagesExtractor(codeItemRepository, this.code.getAbsolutePath(), this.metamodel);
             return List.of(codeExtractor);
         }
         throw new IllegalStateException("CodeConfigurationType not supported");

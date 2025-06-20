@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.id.agents;
 
 import org.eclipse.collections.api.factory.Lists;
@@ -7,24 +7,24 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.legacy.ModelInstance;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.legacy.ModelInstanceImpl;
+import edu.kit.kastel.mcse.ardoco.core.api.entity.ArchitectureEntityImpl;
+import edu.kit.kastel.mcse.ardoco.core.api.entity.ModelEntity;
 import edu.kit.kastel.mcse.ardoco.id.informants.UndocumentedModelElementInconsistencyInformant;
 
 /**
  * Tests for the {@link UndocumentedModelElementInconsistencyInformant}.
  */
 class UndocumentedModelElementInconsistencyTest {
-    private MutableList<ModelInstance> modelInstances;
+    private MutableList<ModelEntity> modelInstances;
 
     @BeforeEach
     void beforeEach() {
         modelInstances = Lists.mutable.empty();
-        modelInstances.add(new ModelInstanceImpl("DummyRecommender", "BasicComponent", "1"));
-        modelInstances.add(new ModelInstanceImpl("ExpertRecommender", "CompositeComponent", "2"));
-        modelInstances.add(new ModelInstanceImpl("Cache", "Interface", "3"));
-        modelInstances.add(new ModelInstanceImpl("WebUI", "BasicComponent", "4"));
-        modelInstances.add(new ModelInstanceImpl("Only Suffix", "Component", "5"));
+        modelInstances.add(new ArchitectureEntityImpl("DummyRecommender", "BasicComponent", "1"));
+        modelInstances.add(new ArchitectureEntityImpl("ExpertRecommender", "CompositeComponent", "2"));
+        modelInstances.add(new ArchitectureEntityImpl("Cache", "Interface", "3"));
+        modelInstances.add(new ArchitectureEntityImpl("WebUI", "BasicComponent", "4"));
+        modelInstances.add(new ArchitectureEntityImpl("Only Suffix", "Component", "5"));
     }
 
     @Test
@@ -40,7 +40,7 @@ class UndocumentedModelElementInconsistencyTest {
         var filteredList = UndocumentedModelElementInconsistencyInformant.filterWithWhitelist(modelInstances, whitelist);
         Assertions.assertAll(//
                 () -> Assertions.assertEquals(1, filteredList.size()), //
-                () -> Assertions.assertEquals("4", filteredList.getFirst().getUid()));
+                () -> Assertions.assertEquals("4", filteredList.getFirst().getId()));
     }
 
     @Test

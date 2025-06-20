@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.tracelink;
 
 import java.io.Serial;
@@ -8,6 +8,12 @@ import java.util.Objects;
 import edu.kit.kastel.mcse.ardoco.core.api.entity.Entity;
 import edu.kit.kastel.mcse.ardoco.core.common.tuple.Pair;
 
+/**
+ * Abstract base class for trace links between two entities. A {@link TraceLink} connects two endpoints of types {@code E1} and {@code E2}.
+ *
+ * @param <E1> the type of the first entity
+ * @param <E2> the type of the second entity
+ */
 public abstract class TraceLink<E1 extends Entity, E2 extends Entity> implements Serializable {
     @Serial
     private static final long serialVersionUID = -2363643561606530433L;

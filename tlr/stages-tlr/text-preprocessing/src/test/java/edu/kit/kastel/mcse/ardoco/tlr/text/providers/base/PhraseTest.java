@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.text.providers.base;
 
 import org.eclipse.collections.api.list.ImmutableList;
@@ -41,16 +41,16 @@ public abstract class PhraseTest {
     }
 
     @Test
-    void getSentenceNoTest() {
+    void getSentenceNumberTest() {
         Assertions.assertAll(//
-                () -> Assertions.assertEquals(SENTENCE_NO, npPhrase.getSentenceNo()), //
-                () -> Assertions.assertEquals(SENTENCE_NO, vpPhrase.getSentenceNo()), //
-                () -> Assertions.assertEquals(SENTENCE_NO, sentencePhrase.getSentenceNo()));
+                () -> Assertions.assertEquals(SENTENCE_NO, npPhrase.getSentenceNumber()), //
+                () -> Assertions.assertEquals(SENTENCE_NO, vpPhrase.getSentenceNumber()), //
+                () -> Assertions.assertEquals(SENTENCE_NO, sentencePhrase.getSentenceNumber()));
     }
 
     @Test
     void getSentenceTest() {
-        Assertions.assertEquals(sentence.getSentenceNumber(), npPhrase.getSentenceNo());
+        Assertions.assertEquals(sentence.getSentenceNumber(), npPhrase.getSentenceNumber());
     }
 
     @Test
@@ -76,39 +76,39 @@ public abstract class PhraseTest {
     }
 
     @Test
-    void isSuperPhraseOfTest() {
+    void isSuperphraseOfTest() {
         Assertions.assertAll(//
-                () -> Assertions.assertTrue(sentencePhrase.isSuperPhraseOf(vpPhrase)), //
-                () -> Assertions.assertTrue(sentencePhrase.isSuperPhraseOf(npPhrase)), //
-                () -> Assertions.assertTrue(vpPhrase.isSuperPhraseOf(npPhrase)), //
-                () -> Assertions.assertFalse(npPhrase.isSuperPhraseOf(vpPhrase)), //
-                () -> Assertions.assertFalse(npPhrase.isSuperPhraseOf(sentencePhrase)), //
-                () -> Assertions.assertFalse(vpPhrase.isSuperPhraseOf(sentencePhrase)), //
-                () -> Assertions.assertFalse(npPhrase.isSuperPhraseOf(npPhrase)), //
-                () -> Assertions.assertFalse(vpPhrase.isSuperPhraseOf(vpPhrase)), //
-                () -> Assertions.assertFalse(sentencePhrase.isSuperPhraseOf(sentencePhrase)));
+                () -> Assertions.assertTrue(sentencePhrase.isSuperphraseOf(vpPhrase)), //
+                () -> Assertions.assertTrue(sentencePhrase.isSuperphraseOf(npPhrase)), //
+                () -> Assertions.assertTrue(vpPhrase.isSuperphraseOf(npPhrase)), //
+                () -> Assertions.assertFalse(npPhrase.isSuperphraseOf(vpPhrase)), //
+                () -> Assertions.assertFalse(npPhrase.isSuperphraseOf(sentencePhrase)), //
+                () -> Assertions.assertFalse(vpPhrase.isSuperphraseOf(sentencePhrase)), //
+                () -> Assertions.assertFalse(npPhrase.isSuperphraseOf(npPhrase)), //
+                () -> Assertions.assertFalse(vpPhrase.isSuperphraseOf(vpPhrase)), //
+                () -> Assertions.assertFalse(sentencePhrase.isSuperphraseOf(sentencePhrase)));
 
     }
 
     @Test
-    void isSubPhraseOfTest() {
+    void isSubphraseOfTest() {
         Assertions.assertAll(//
-                () -> Assertions.assertTrue(vpPhrase.isSubPhraseOf(sentencePhrase)), //
-                () -> Assertions.assertTrue(npPhrase.isSubPhraseOf(sentencePhrase)), //
-                () -> Assertions.assertTrue(npPhrase.isSubPhraseOf(vpPhrase)), //
-                () -> Assertions.assertFalse(vpPhrase.isSubPhraseOf(npPhrase)), //
-                () -> Assertions.assertFalse(sentencePhrase.isSubPhraseOf(npPhrase)), //
-                () -> Assertions.assertFalse(sentencePhrase.isSubPhraseOf(vpPhrase)), //
-                () -> Assertions.assertFalse(npPhrase.isSubPhraseOf(npPhrase)), //
-                () -> Assertions.assertFalse(vpPhrase.isSubPhraseOf(vpPhrase)), //
-                () -> Assertions.assertFalse(sentencePhrase.isSubPhraseOf(sentencePhrase)));
+                () -> Assertions.assertTrue(vpPhrase.isSubphraseOf(sentencePhrase)), //
+                () -> Assertions.assertTrue(npPhrase.isSubphraseOf(sentencePhrase)), //
+                () -> Assertions.assertTrue(npPhrase.isSubphraseOf(vpPhrase)), //
+                () -> Assertions.assertFalse(vpPhrase.isSubphraseOf(npPhrase)), //
+                () -> Assertions.assertFalse(sentencePhrase.isSubphraseOf(npPhrase)), //
+                () -> Assertions.assertFalse(sentencePhrase.isSubphraseOf(vpPhrase)), //
+                () -> Assertions.assertFalse(npPhrase.isSubphraseOf(npPhrase)), //
+                () -> Assertions.assertFalse(vpPhrase.isSubphraseOf(vpPhrase)), //
+                () -> Assertions.assertFalse(sentencePhrase.isSubphraseOf(sentencePhrase)));
     }
 
     @Test
-    void getSubPhrasesTest() {
-        var sentenceSubPhrases = sentencePhrase.getSubPhrases();
-        var vpSubPhrases = vpPhrase.getSubPhrases();
-        var npSubPhrases = npPhrase.getSubPhrases();
+    void getSubphrasesTest() {
+        var sentenceSubPhrases = sentencePhrase.getSubphrases();
+        var vpSubPhrases = vpPhrase.getSubphrases();
+        var npSubPhrases = npPhrase.getSubphrases();
 
         Assertions.assertAll(//
                 () -> Assertions.assertEquals(3, sentenceSubPhrases.size()), //

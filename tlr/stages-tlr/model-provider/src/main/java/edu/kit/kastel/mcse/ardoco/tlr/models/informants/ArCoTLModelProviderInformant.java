@@ -1,7 +1,8 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.models.informants;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedMap;
 
@@ -22,12 +23,14 @@ public final class ArCoTLModelProviderInformant extends Informant {
     private static final String MODEL_STATES_DATA = "ModelStatesData";
     private final Extractor extractor;
     private final File fromFile;
+    private final Metamodel metamodel;
 
     // Needed for Configuration Generation
     private ArCoTLModelProviderInformant() {
         super(null, null);
         this.extractor = null;
         this.fromFile = null;
+        this.metamodel = null;
     }
 
     /**
@@ -36,9 +39,10 @@ public final class ArCoTLModelProviderInformant extends Informant {
      * @param dataRepository the data repository
      * @param fromFile       whether the model should be read from a file
      */
-    public ArCoTLModelProviderInformant(DataRepository dataRepository, File fromFile) {
+    public ArCoTLModelProviderInformant(DataRepository dataRepository, File fromFile, Metamodel metamodel) {
         super("Extractor File", dataRepository);
-        this.fromFile = fromFile;
+        this.fromFile = Objects.requireNonNull(fromFile);
+        this.metamodel = Objects.requireNonNull(metamodel);
         this.extractor = null;
     }
 
@@ -52,6 +56,7 @@ public final class ArCoTLModelProviderInformant extends Informant {
         super("Extractor " + (extractor == null ? "File" : extractor.getClass().getSimpleName()), dataRepository);
         this.extractor = extractor;
         this.fromFile = null;
+        this.metamodel = null;
     }
 
     @Override
@@ -59,27 +64,29 @@ public final class ArCoTLModelProviderInformant extends Informant {
         Model extractedModel;
 
         if (this.fromFile != null) {
-            extractedModel = CodeExtractor.readInCodeModel(this.fromFile);
-            this.addModelStateToDataRepository(Metamodel.CODE, extractedModel);
+            extractedModel = CodeExtractor.readInCodeModel(this.fromFile, metamodel);
+            this.addModelStateToDataRepository(extractedModel.getMetamodel(), extractedModel);
             return;
         }
 
         IdentifierProvider.reset();
         this.getLogger().info("Extracting code model.");
         extractedModel = this.extractor.extractModel();
+        this.addModelStateToDataRepository(extractedModel.getMetamodel(), extractedModel);
         if (this.extractor instanceof CodeExtractor codeExtractor && extractedModel instanceof CodeModel codeModel) {
             this.getLogger().info("Writing out code model to file in directory.");
             codeExtractor.writeOutCodeModel(codeModel);
         }
-        this.addModelStateToDataRepository(this.extractor.getModelId(), extractedModel);
+        this.addModelStateToDataRepository(this.extractor.getMetamodel(), extractedModel);
     }
 
-    private void addModelStateToDataRepository(Metamodel modelId, Model model) {
+    //TODO: Remove this method
+    private void addModelStateToDataRepository(Metamodel metamodel, Model model) {
         var dataRepository = this.getDataRepository();
         Optional<ModelStates> modelStatesOptional = dataRepository.getData(ArCoTLModelProviderInformant.MODEL_STATES_DATA, ModelStates.class);
         var modelStates = modelStatesOptional.orElseGet(ModelStates::new);
 
-        modelStates.addModel(modelId, model);
+        modelStates.addModel(metamodel, model);
 
         if (modelStatesOptional.isEmpty()) {
             dataRepository.addData(ArCoTLModelProviderInformant.MODEL_STATES_DATA, modelStates);

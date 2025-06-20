@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.text.providers.informants.corenlp;
 
 import java.io.IOException;
@@ -24,6 +24,8 @@ import edu.stanford.nlp.trees.Tree;
 
 class SentenceImpl implements Sentence {
     private static final Logger logger = LoggerFactory.getLogger(SentenceImpl.class);
+    @Serial
+    private static final long serialVersionUID = 3807070330613904325L;
 
     private MutableList<Word> words = Lists.mutable.empty();
     private MutableList<Phrase> phrases = Lists.mutable.empty();
@@ -50,7 +52,7 @@ class SentenceImpl implements Sentence {
     @Override
     public ImmutableList<Word> getWords() {
         if (words.isEmpty()) {
-            this.words = Lists.mutable.ofAll(parent.words().select(w -> w.getSentenceNo() == sentenceNumber));
+            this.words = Lists.mutable.ofAll(parent.words().select(w -> w.getSentenceNumber() == sentenceNumber));
         }
         return words.toImmutable();
     }

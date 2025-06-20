@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.architecture.pcm;
 
 import java.io.File;
@@ -7,9 +7,10 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.ArchitectureModelType;
-import edu.kit.kastel.mcse.ardoco.core.api.models.ModelType;
+import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureComponentModel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureModel;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureModelWithComponentsAndInterfaces;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.ArchitectureComponent;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.ArchitectureInterface;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.ArchitectureItem;
@@ -27,29 +28,8 @@ import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.architecture.
 @Deterministic
 public final class PcmExtractor extends ArchitectureExtractor {
 
-    public PcmExtractor(String path) {
-        super(path);
-    }
-
-    /**
-     * Extracts an architecture model, i.e. an AMTL instance, from a PCM instance.
-     *
-     * @return the extracted architecture model
-     */
-    @Override
-    public ArchitectureModel extractModel() {
-        PcmModel originalModel = new PcmModel(new File(path));
-        List<ArchitectureInterface> interfaces = extractInterfaces(originalModel);
-        List<ArchitectureComponent> components = extractComponents(originalModel, interfaces);
-        List<ArchitectureItem> endpoints = new ArrayList<>();
-        endpoints.addAll(interfaces);
-        endpoints.addAll(components);
-        return new ArchitectureModel(endpoints);
-    }
-
-    @Override
-    public ModelType getModelType() {
-        return ArchitectureModelType.PCM;
+    public PcmExtractor(String path, Metamodel metamodelToExtract) {
+        super(path, metamodelToExtract);
     }
 
     private static List<ArchitectureInterface> extractInterfaces(PcmModel originalModel) {
@@ -91,4 +71,28 @@ public final class PcmExtractor extends ArchitectureExtractor {
         return interfaces.stream().filter(modelInterface -> modelInterface.getId().equals(id)).findFirst().orElseThrow();
     }
 
+    /**
+     * Extracts an architecture model, i.e. an AMTL instance, from a PCM instance.
+     *
+     * @return the extracted architecture model
+     */
+    @Override
+    public ArchitectureModel extractModel() {
+
+        PcmModel originalModel = new PcmModel(new File(path));
+        List<ArchitectureInterface> interfaces = extractInterfaces(originalModel);
+        List<ArchitectureComponent> components = extractComponents(originalModel, interfaces);
+        List<ArchitectureItem> endpoints = new ArrayList<>();
+        endpoints.addAll(interfaces);
+        endpoints.addAll(components);
+
+        ArchitectureModel architectureModelWithComponentsAndInterfaces = new ArchitectureModelWithComponentsAndInterfaces(endpoints);
+        ArchitectureModel architectureComponentModel = new ArchitectureComponentModel(architectureModelWithComponentsAndInterfaces);
+
+        return switch (metamodelToExtract) {
+            case Metamodel.ARCHITECTURE_WITH_COMPONENTS_AND_INTERFACES -> architectureModelWithComponentsAndInterfaces;
+            case Metamodel.ARCHITECTURE_ONLY_COMPONENTS -> architectureComponentModel;
+            default -> throw new IllegalArgumentException("Unsupported metamodel: " + metamodelToExtract);
+        };
+    }
 }

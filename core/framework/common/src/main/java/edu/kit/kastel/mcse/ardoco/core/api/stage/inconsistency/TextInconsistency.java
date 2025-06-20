@@ -1,12 +1,15 @@
-/* Licensed under MIT 2022-2023. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.stage.inconsistency;
 
 /**
- * This interface extends the interface {@link Inconsistency} by stating that the inconsistency stems from a concrete textual
- * component, i.e., a sentence. This way, we can use information on the text-side to give more details.
+ * Extends {@link Inconsistency} for inconsistencies stemming from a concrete textual component (e.g., a sentence).
+ * Provides information on the text-side for more details.
  */
 public interface TextInconsistency extends Inconsistency {
-
+    /**
+     * Returns the sentence number associated with this inconsistency.
+     *
+     * @return the sentence number
+     */
     int getSentenceNumber();
-
 }

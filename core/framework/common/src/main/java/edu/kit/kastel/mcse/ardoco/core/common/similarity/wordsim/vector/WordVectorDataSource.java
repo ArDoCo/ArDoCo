@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2023. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.vector;
 
 import java.util.Optional;
@@ -12,9 +12,8 @@ public interface WordVectorDataSource {
      * Attempts to retrieve the vector representation for the given word.
      *
      * @param word the word
-     * @return the vector representation of that word, or {@link Optional#empty()} if no vector representation for the
-     *         given word exists
-     * @throws RetrieveVectorException if an error occurs while trying to retrieve the vector
+     * @return the vector representation, or {@link Optional#empty()} if not found
+     * @throws RetrieveVectorException if an error occurs while retrieving the vector
      */
     Optional<float[]> getWordVector(String word) throws RetrieveVectorException;
 

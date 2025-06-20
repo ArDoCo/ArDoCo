@@ -1,4 +1,4 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.id.tests.integration;
 
 import java.io.IOException;
@@ -28,7 +28,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureModel;
+import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureComponentModel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.ArchitectureItem;
 import edu.kit.kastel.mcse.ardoco.core.api.output.ArDoCoResult;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.inconsistency.ModelInconsistency;
@@ -52,234 +53,20 @@ import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.architecture.
  */
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class InconsistencyDetectionEvaluationIT {
-    private static final Logger logger = LoggerFactory.getLogger(InconsistencyDetectionEvaluationIT.class);
-
-    private static final String OUTPUT = "target/testout";
     public static final String DIRECTORY_NAME = "ardoco_eval_id";
-
+    private static final Logger logger = LoggerFactory.getLogger(InconsistencyDetectionEvaluationIT.class);
+    private static final String OUTPUT = "target/testout";
     private static final String LINE_SEPARATOR = System.lineSeparator();
     private static final Map<GoldStandardProject, ArDoCoResult> arDoCoResults = new LinkedHashMap<>();
-
-    /**
-     * Tests the inconsistency detection for missing model elements on all {@link Project projects}.
-     * <p>
-     * NOTE: if you only want to test a specific project, you can simply set up the EnumSource. For more details, see
-     * <a href="https://www.baeldung.com/parameterized-tests-junit-5#3-enum">here</a>
-     * Example: add ", names = { "BIGBLUEBUTTON" }" to EnumSource However, make sure to revert this before you commit and push!
-     *
-     * @param goldStandardProject Project that gets inserted automatically with the enum {@link Project}.
-     */
-    @DisplayName("Evaluating MME-Inconsistency Detection")
-    @ParameterizedTest(name = "Evaluating MME-Inconsistency for {0}")
-    @EnumSource(Project.class)
-    @Order(1)
-    void missingModelElementInconsistencyIT(GoldStandardProject goldStandardProject) {
-        this.runMissingModelElementInconsistencyEval(goldStandardProject, goldStandardProject.getExpectedInconsistencyResults());
-    }
-
-    protected void runMissingModelElementInconsistencyEval(GoldStandardProject goldStandardProject, ExpectedResults expectedInconsistencyResults) {
-        InconsistencyDetectionEvaluationIT.logger.info("Start evaluation of MME-inconsistency for {}", goldStandardProject.getProjectName());
-        Map<ArchitectureItem, ArDoCoResult> runs = this.produceRuns(goldStandardProject);
-
-        var results = this.calculateEvaluationResults(goldStandardProject, runs);
-
-        EvaluationResults<String> weightedResults = ResultCalculatorUtil.calculateMicroAverageResults(results.toImmutable());
-
-        this.logResultsMissingModelInconsistency(goldStandardProject, weightedResults, expectedInconsistencyResults);
-        this.checkResults(weightedResults, expectedInconsistencyResults);
-
-        this.writeOutResults(goldStandardProject, results, runs);
-    }
-
-    /**
-     * Tests the baseline approach that reports a missing model element inconsistency for each sentence that is not traced to a model element. This test is
-     * enabled by providing the environment variable "testBaseline" with any value.
-     *
-     * @param goldStandardProject Project that gets inserted automatically with the enum {@link Project}.
-     */
-    @EnabledIfEnvironmentVariable(named = "testBaseline", matches = ".*")
-    @DisplayName("Evaluating MME-Inconsistency Detection Baseline")
-    @ParameterizedTest(name = "Evaluating Baseline for {0}")
-    @EnumSource(Project.class)
-    @Order(5)
-    void missingModelElementInconsistencyBaselineIT(GoldStandardProject goldStandardProject) {
-        this.runMissingModelElementInconsistencyBaselineEval(goldStandardProject);
-    }
-
-    protected void runMissingModelElementInconsistencyBaselineEval(GoldStandardProject goldStandardProject) {
-        InconsistencyDetectionEvaluationIT.logger.info("Start evaluation of MME-inconsistency baseline for {}", goldStandardProject.getProjectName());
-
-        HoldBackRunResultsProducer holdBackRunResultsProducer = new HoldBackRunResultsProducer();
-        Map<ArchitectureItem, ArDoCoResult> runs = holdBackRunResultsProducer.produceHoldBackRunResults(goldStandardProject, true);
-
-        Assertions.assertTrue(runs != null && !runs.isEmpty());
-
-        var results = this.calculateEvaluationResults(goldStandardProject, runs);
-
-        var weightedResults = ResultCalculatorUtil.calculateWeightedAverageResults(results.toImmutable());
-
-        if (InconsistencyDetectionEvaluationIT.logger.isInfoEnabled()) {
-            String name = goldStandardProject.getProjectName() + " missing model inconsistency";
-            TestUtil.logResults(InconsistencyDetectionEvaluationIT.logger, name, weightedResults);
-        }
-    }
-
-    /**
-     * Tests the inconsistency detection for undocumented model elements on all {@link Project projects}.
-     *
-     * @param goldStandardProject Project that gets inserted automatically with the enum {@link Project}.
-     */
-    @DisplayName("Evaluate Inconsistency Analyses For MissingTextForModelElementInconsistencies")
-    @ParameterizedTest(name = "Evaluating UME-inconsistency for {0}")
-    @EnumSource(Project.class)
-    @Order(10)
-    void missingTextInconsistencyIT(GoldStandardProject goldStandardProject) {
-        this.runMissingTextInconsistencyEval(goldStandardProject);
-    }
-
-    private void runMissingTextInconsistencyEval(GoldStandardProject goldStandardProject) {
-        var projectResults = InconsistencyDetectionEvaluationIT.arDoCoResults.get(goldStandardProject);
-        if (projectResults == null) {
-            this.produceRuns(goldStandardProject);
-            projectResults = InconsistencyDetectionEvaluationIT.arDoCoResults.get(goldStandardProject);
-        }
-        Assertions.assertNotNull(projectResults, "No results found.");
-
-        MutableList<String> expectedInconsistentModelElements = goldStandardProject.getMissingTextForModelElementGoldStandard();
-        var inconsistentModelElements = projectResults.getAllModelInconsistencies().collect(ModelInconsistency::getModelInstanceUid).toList();
-        var results = TestUtil.compareInconsistencies(projectResults, inconsistentModelElements.toImmutable(), expectedInconsistentModelElements.toImmutable());
-
-        String name = goldStandardProject.getProjectName() + " missing text inconsistency";
-        TestUtil.logExplicitResults(InconsistencyDetectionEvaluationIT.logger, name, results);
-        this.writeOutResults(goldStandardProject, results);
-    }
-
-    private Map<ArchitectureItem, ArDoCoResult> produceRuns(GoldStandardProject goldStandardProject) {
-        HoldBackRunResultsProducer holdBackRunResultsProducer = this.getHoldBackRunResultsProducer();
-
-        Map<ArchitectureItem, ArDoCoResult> runs = holdBackRunResultsProducer.produceHoldBackRunResults(goldStandardProject, false);
-
-        ArDoCoResult baseArDoCoResult = runs.get(null);
-        InconsistencyDetectionEvaluationIT.saveOutput(goldStandardProject, baseArDoCoResult);
-        InconsistencyDetectionEvaluationIT.arDoCoResults.put(goldStandardProject, baseArDoCoResult);
-        return runs;
-    }
-
-    protected HoldBackRunResultsProducer getHoldBackRunResultsProducer() {
-        return new HoldBackRunResultsProducer();
-    }
-
-    private MutableList<EvaluationResults<String>> calculateEvaluationResults(GoldStandardProject goldStandardProject,
-            Map<ArchitectureItem, ArDoCoResult> runs) {
-
-        Map<ArchitectureItem, EvaluationResults<String>> results = Maps.mutable.empty();
-
-        for (var run : runs.entrySet()) {
-            ArchitectureItem modelInstance = run.getKey();
-            ArDoCoResult arDoCoResult = run.getValue();
-            var runEvalResults = this.evaluateRun(goldStandardProject, modelInstance, arDoCoResult);
-            if (runEvalResults != null) {
-                results.put(modelInstance, runEvalResults);
-            } else {
-                InconsistencyDetectionEvaluationIT.logger.error("Evaluation results for {} are null.", modelInstance);
-            }
-        }
-        return Lists.mutable.ofAll(results.values());
-    }
-
-    private EvaluationResults<String> evaluateRun(GoldStandardProject goldStandardProject, ArchitectureItem removedElement, ArDoCoResult arDoCoResult) {
-        var modelId = arDoCoResult.getModelIds().getFirst();
-
-        ImmutableList<MissingModelInstanceInconsistency> inconsistencies = arDoCoResult.getInconsistenciesOfTypeForModel(modelId,
-                MissingModelInstanceInconsistency.class);
-        if (removedElement == null) {
-            // base case
-            return null;
-        }
-
-        var goldStandard = goldStandardProject.getTlrGoldStandard(InconsistencyDetectionEvaluationIT.getPcmModel(goldStandardProject));
-        var expectedLines = goldStandard.getSentencesWithElement(removedElement).distinct().collect(Object::toString);
-        var actualSentences = inconsistencies.collect(MissingModelInstanceInconsistency::sentence).distinct().collect(Object::toString);
-
-        return InconsistencyDetectionEvaluationIT.calculateEvaluationResults(arDoCoResult, expectedLines, actualSentences);
-    }
 
     private static EvaluationResults<String> calculateEvaluationResults(ArDoCoResult arDoCoResult, ImmutableList<String> expectedLines,
             ImmutableList<String> actualSentences) {
         return TestUtil.compareInconsistencies(arDoCoResult, actualSentences, expectedLines);
     }
 
-    private static ArchitectureModel getPcmModel(GoldStandardProject goldStandardProject) {
-        return new PcmExtractor(goldStandardProject.getModelFile().getAbsolutePath()).extractModel();
-    }
-
-    private void logResultsMissingModelInconsistency(GoldStandardProject goldStandardProject, EvaluationResults<String> weightedAverageResult,
-            ExpectedResults expectedResults) {
-        if (InconsistencyDetectionEvaluationIT.logger.isInfoEnabled()) {
-            String name = goldStandardProject.getProjectName() + " missing model inconsistency";
-            TestUtil.logExtendedResultsWithExpected(InconsistencyDetectionEvaluationIT.logger, this, name, weightedAverageResult, expectedResults);
-        }
-    }
-
-    private void checkResults(EvaluationResults<String> results, ExpectedResults expectedResults) {
-        Assertions.assertAll(//
-                () -> Assertions.assertTrue(results.precision() >= expectedResults.precision(), "Precision " + results
-                        .precision() + " is below the expected minimum value " + expectedResults.precision()), //
-                () -> Assertions.assertTrue(results.recall() >= expectedResults.recall(), "Recall " + results
-                        .recall() + " is below the expected minimum value " + expectedResults.recall()), //
-                () -> Assertions.assertTrue(results.f1() >= expectedResults.f1(), "F1 " + results
-                        .f1() + " is below the expected minimum value " + expectedResults.f1()), () -> Assertions.assertTrue(results
-                                .accuracy() >= expectedResults.accuracy(), "Accuracy " + results
-                                        .accuracy() + " is below the expected minimum value " + expectedResults.accuracy()), //
-                () -> Assertions.assertTrue(results.phiCoefficient() >= expectedResults.phiCoefficient(), "Phi coefficient " + results
-                        .phiCoefficient() + " is below the expected " + "minimum value " + expectedResults.phiCoefficient()));
-    }
-
-    private void writeOutResults(GoldStandardProject goldStandardProject, List<EvaluationResults<String>> results, Map<ArchitectureItem, ArDoCoResult> runs) {
-        var outputs = InconsistencyDetectionEvaluationIT.createOutput(goldStandardProject, results, runs);
-        var outputBuilder = outputs.getOne();
-        var detailedOutputBuilder = outputs.getTwo();
-
-        Path outputPath = Path.of(InconsistencyDetectionEvaluationIT.OUTPUT);
-        Path idEvalPath = outputPath.resolve(InconsistencyDetectionEvaluationIT.DIRECTORY_NAME);
-        try {
-            Files.createDirectories(outputPath);
-            Files.createDirectories(idEvalPath);
-        } catch (IOException e) {
-            InconsistencyDetectionEvaluationIT.logger.warn("Could not create directories.", e);
-        }
-
-        String projectFileName = "inconsistencies_" + goldStandardProject.getProjectName() + ".txt";
-        var filename = idEvalPath.resolve(projectFileName).toFile().getAbsolutePath();
-        FilePrinter.writeToFile(filename, outputBuilder.toString());
-
-        String detailedProjectFileName = "detailed_" + projectFileName;
-        var detailedFilename = idEvalPath.resolve(detailedProjectFileName).toFile().getAbsolutePath();
-        FilePrinter.writeToFile(detailedFilename, detailedOutputBuilder.toString());
-    }
-
-    private void writeOutResults(GoldStandardProject goldStandardProject, EvaluationResults<String> results) {
-        Path outputPath = Path.of(InconsistencyDetectionEvaluationIT.OUTPUT);
-        Path idEvalPath = outputPath.resolve(InconsistencyDetectionEvaluationIT.DIRECTORY_NAME);
-        try {
-            Files.createDirectories(outputPath);
-            Files.createDirectories(idEvalPath);
-        } catch (IOException e) {
-            InconsistencyDetectionEvaluationIT.logger.warn("Could not create directories.", e);
-        }
-
-        var outputBuilder = InconsistencyDetectionEvaluationIT.createStringBuilderWithHeader(goldStandardProject);
-        outputBuilder.append(TestUtil.createResultLogString("Inconsistent Model Elements", results));
-        outputBuilder.append(InconsistencyDetectionEvaluationIT.LINE_SEPARATOR);
-        outputBuilder.append("Number of True Positives: ").append(results.truePositives().size());
-        outputBuilder.append(InconsistencyDetectionEvaluationIT.LINE_SEPARATOR);
-        outputBuilder.append("Number of False Positives: ").append(results.falsePositives().size());
-        outputBuilder.append(InconsistencyDetectionEvaluationIT.LINE_SEPARATOR);
-        outputBuilder.append("Number of False Negatives: ").append(results.falseNegatives().size());
-
-        String projectFileName = "inconsistentModelElements_" + goldStandardProject.getProjectName() + ".txt";
-        var filename = idEvalPath.resolve(projectFileName).toFile().getAbsolutePath();
-        FilePrinter.writeToFile(filename, outputBuilder.toString());
+    private static ArchitectureComponentModel getComponentModel(GoldStandardProject goldStandardProject) {
+        return new ArchitectureComponentModel(new PcmExtractor(goldStandardProject.getModelFile().getAbsolutePath(), Metamodel.ARCHITECTURE_ONLY_COMPONENTS)
+                .extractModel());
     }
 
     private static void saveOutput(GoldStandardProject goldStandardProject, ArDoCoResult arDoCoResult) {
@@ -419,7 +206,220 @@ class InconsistencyDetectionEvaluationIT {
     }
 
     private static ImmutableList<MissingModelInstanceInconsistency> getInitialInconsistencies(ArDoCoResult arDoCoResult) {
-        var id = arDoCoResult.getModelIds().getFirst();
+        var id = arDoCoResult.getMetamodels().getFirst();
         return arDoCoResult.getInconsistenciesOfTypeForModel(id, MissingModelInstanceInconsistency.class);
+    }
+
+    /**
+     * Tests the inconsistency detection for missing model elements on all {@link Project projects}.
+     * <p>
+     * NOTE: if you only want to test a specific project, you can simply set up the EnumSource. For more details, see
+     * <a href="https://www.baeldung.com/parameterized-tests-junit-5#3-enum">here</a>
+     * Example: add ", names = { "BIGBLUEBUTTON" }" to EnumSource However, make sure to revert this before you commit and push!
+     *
+     * @param goldStandardProject Project that gets inserted automatically with the enum {@link Project}.
+     */
+    @DisplayName("Evaluating MME-Inconsistency Detection")
+    @ParameterizedTest(name = "Evaluating MME-Inconsistency for {0}")
+    @EnumSource(Project.class)
+    @Order(1)
+    void missingModelElementInconsistencyIT(GoldStandardProject goldStandardProject) {
+        this.runMissingModelElementInconsistencyEval(goldStandardProject, goldStandardProject.getExpectedInconsistencyResults());
+    }
+
+    protected void runMissingModelElementInconsistencyEval(GoldStandardProject goldStandardProject, ExpectedResults expectedInconsistencyResults) {
+        InconsistencyDetectionEvaluationIT.logger.info("Start evaluation of MME-inconsistency for {}", goldStandardProject.getProjectName());
+        Map<ArchitectureItem, ArDoCoResult> runs = this.produceRuns(goldStandardProject);
+
+        var results = this.calculateEvaluationResults(goldStandardProject, runs);
+
+        EvaluationResults<String> weightedResults = ResultCalculatorUtil.calculateMicroAverageResults(results.toImmutable());
+
+        this.logResultsMissingModelInconsistency(goldStandardProject, weightedResults, expectedInconsistencyResults);
+        this.checkResults(weightedResults, expectedInconsistencyResults);
+
+        this.writeOutResults(goldStandardProject, results, runs);
+    }
+
+    /**
+     * Tests the baseline approach that reports a missing model element inconsistency for each sentence that is not traced to a model element. This test is
+     * enabled by providing the environment variable "testBaseline" with any value.
+     *
+     * @param goldStandardProject Project that gets inserted automatically with the enum {@link Project}.
+     */
+    @EnabledIfEnvironmentVariable(named = "testBaseline", matches = ".*")
+    @DisplayName("Evaluating MME-Inconsistency Detection Baseline")
+    @ParameterizedTest(name = "Evaluating Baseline for {0}")
+    @EnumSource(Project.class)
+    @Order(5)
+    void missingModelElementInconsistencyBaselineIT(GoldStandardProject goldStandardProject) {
+        this.runMissingModelElementInconsistencyBaselineEval(goldStandardProject);
+    }
+
+    protected void runMissingModelElementInconsistencyBaselineEval(GoldStandardProject goldStandardProject) {
+        InconsistencyDetectionEvaluationIT.logger.info("Start evaluation of MME-inconsistency baseline for {}", goldStandardProject.getProjectName());
+
+        HoldBackRunResultsProducer holdBackRunResultsProducer = new HoldBackRunResultsProducer();
+        Map<ArchitectureItem, ArDoCoResult> runs = holdBackRunResultsProducer.produceHoldBackRunResults(goldStandardProject, true);
+
+        Assertions.assertTrue(runs != null && !runs.isEmpty());
+
+        var results = this.calculateEvaluationResults(goldStandardProject, runs);
+
+        var weightedResults = ResultCalculatorUtil.calculateWeightedAverageResults(results.toImmutable());
+
+        if (InconsistencyDetectionEvaluationIT.logger.isInfoEnabled()) {
+            String name = goldStandardProject.getProjectName() + " missing model inconsistency";
+            TestUtil.logResults(InconsistencyDetectionEvaluationIT.logger, name, weightedResults);
+        }
+    }
+
+    /**
+     * Tests the inconsistency detection for undocumented model elements on all {@link Project projects}.
+     *
+     * @param goldStandardProject Project that gets inserted automatically with the enum {@link Project}.
+     */
+    @DisplayName("Evaluate Inconsistency Analyses For MissingTextForModelElementInconsistencies")
+    @ParameterizedTest(name = "Evaluating UME-inconsistency for {0}")
+    @EnumSource(Project.class)
+    @Order(10)
+    void missingTextInconsistencyIT(GoldStandardProject goldStandardProject) {
+        this.runMissingTextInconsistencyEval(goldStandardProject);
+    }
+
+    private void runMissingTextInconsistencyEval(GoldStandardProject goldStandardProject) {
+        var projectResults = InconsistencyDetectionEvaluationIT.arDoCoResults.get(goldStandardProject);
+        if (projectResults == null) {
+            this.produceRuns(goldStandardProject);
+            projectResults = InconsistencyDetectionEvaluationIT.arDoCoResults.get(goldStandardProject);
+        }
+        Assertions.assertNotNull(projectResults, "No results found.");
+
+        MutableList<String> expectedInconsistentModelElements = goldStandardProject.getMissingTextForModelElementGoldStandard();
+        var inconsistentModelElements = projectResults.getAllModelInconsistencies().collect(ModelInconsistency::getModelInstanceUid).toList();
+        var results = TestUtil.compareInconsistencies(projectResults, inconsistentModelElements.toImmutable(), expectedInconsistentModelElements.toImmutable());
+
+        String name = goldStandardProject.getProjectName() + " missing text inconsistency";
+        TestUtil.logExplicitResults(InconsistencyDetectionEvaluationIT.logger, name, results);
+        this.writeOutResults(goldStandardProject, results);
+    }
+
+    private Map<ArchitectureItem, ArDoCoResult> produceRuns(GoldStandardProject goldStandardProject) {
+        HoldBackRunResultsProducer holdBackRunResultsProducer = this.getHoldBackRunResultsProducer();
+
+        Map<ArchitectureItem, ArDoCoResult> runs = holdBackRunResultsProducer.produceHoldBackRunResults(goldStandardProject, false);
+
+        ArDoCoResult baseArDoCoResult = runs.get(null);
+        InconsistencyDetectionEvaluationIT.saveOutput(goldStandardProject, baseArDoCoResult);
+        InconsistencyDetectionEvaluationIT.arDoCoResults.put(goldStandardProject, baseArDoCoResult);
+        return runs;
+    }
+
+    protected HoldBackRunResultsProducer getHoldBackRunResultsProducer() {
+        return new HoldBackRunResultsProducer();
+    }
+
+    private MutableList<EvaluationResults<String>> calculateEvaluationResults(GoldStandardProject goldStandardProject,
+            Map<ArchitectureItem, ArDoCoResult> runs) {
+
+        Map<ArchitectureItem, EvaluationResults<String>> results = Maps.mutable.empty();
+
+        for (var run : runs.entrySet()) {
+            ArchitectureItem modelInstance = run.getKey();
+            ArDoCoResult arDoCoResult = run.getValue();
+            var runEvalResults = this.evaluateRun(goldStandardProject, modelInstance, arDoCoResult);
+            if (runEvalResults != null) {
+                results.put(modelInstance, runEvalResults);
+            } else {
+                InconsistencyDetectionEvaluationIT.logger.error("Evaluation results for {} are null.", modelInstance);
+            }
+        }
+        return Lists.mutable.ofAll(results.values());
+    }
+
+    private EvaluationResults<String> evaluateRun(GoldStandardProject goldStandardProject, ArchitectureItem removedElement, ArDoCoResult arDoCoResult) {
+        var metamodel = arDoCoResult.getMetamodels().getFirst();
+
+        ImmutableList<MissingModelInstanceInconsistency> inconsistencies = arDoCoResult.getInconsistenciesOfTypeForModel(metamodel,
+                MissingModelInstanceInconsistency.class);
+        if (removedElement == null) {
+            // base case
+            return null;
+        }
+
+        var goldStandard = goldStandardProject.getTlrGoldStandard(InconsistencyDetectionEvaluationIT.getComponentModel(goldStandardProject));
+        var expectedLines = goldStandard.getSentencesWithElement(removedElement).distinct().collect(Object::toString);
+        var actualSentences = inconsistencies.collect(MissingModelInstanceInconsistency::sentence).distinct().collect(Object::toString);
+
+        return InconsistencyDetectionEvaluationIT.calculateEvaluationResults(arDoCoResult, expectedLines, actualSentences);
+    }
+
+    private void logResultsMissingModelInconsistency(GoldStandardProject goldStandardProject, EvaluationResults<String> weightedAverageResult,
+            ExpectedResults expectedResults) {
+        if (InconsistencyDetectionEvaluationIT.logger.isInfoEnabled()) {
+            String name = goldStandardProject.getProjectName() + " missing model inconsistency";
+            TestUtil.logExtendedResultsWithExpected(InconsistencyDetectionEvaluationIT.logger, this, name, weightedAverageResult, expectedResults);
+        }
+    }
+
+    private void checkResults(EvaluationResults<String> results, ExpectedResults expectedResults) {
+        Assertions.assertAll(//
+                () -> Assertions.assertTrue(results.precision() >= expectedResults.precision(), "Precision " + results
+                        .precision() + " is below the expected minimum value " + expectedResults.precision()), //
+                () -> Assertions.assertTrue(results.recall() >= expectedResults.recall(), "Recall " + results
+                        .recall() + " is below the expected minimum value " + expectedResults.recall()), //
+                () -> Assertions.assertTrue(results.f1() >= expectedResults.f1(), "F1 " + results
+                        .f1() + " is below the expected minimum value " + expectedResults.f1()), () -> Assertions.assertTrue(results
+                                .accuracy() >= expectedResults.accuracy(), "Accuracy " + results
+                                        .accuracy() + " is below the expected minimum value " + expectedResults.accuracy()), //
+                () -> Assertions.assertTrue(results.phiCoefficient() >= expectedResults.phiCoefficient(), "Phi coefficient " + results
+                        .phiCoefficient() + " is below the expected " + "minimum value " + expectedResults.phiCoefficient()));
+    }
+
+    private void writeOutResults(GoldStandardProject goldStandardProject, List<EvaluationResults<String>> results, Map<ArchitectureItem, ArDoCoResult> runs) {
+        var outputs = InconsistencyDetectionEvaluationIT.createOutput(goldStandardProject, results, runs);
+        var outputBuilder = outputs.getOne();
+        var detailedOutputBuilder = outputs.getTwo();
+
+        Path outputPath = Path.of(InconsistencyDetectionEvaluationIT.OUTPUT);
+        Path idEvalPath = outputPath.resolve(InconsistencyDetectionEvaluationIT.DIRECTORY_NAME);
+        try {
+            Files.createDirectories(outputPath);
+            Files.createDirectories(idEvalPath);
+        } catch (IOException e) {
+            InconsistencyDetectionEvaluationIT.logger.warn("Could not create directories.", e);
+        }
+
+        String projectFileName = "inconsistencies_" + goldStandardProject.getProjectName() + ".txt";
+        var filename = idEvalPath.resolve(projectFileName).toFile().getAbsolutePath();
+        FilePrinter.writeToFile(filename, outputBuilder.toString());
+
+        String detailedProjectFileName = "detailed_" + projectFileName;
+        var detailedFilename = idEvalPath.resolve(detailedProjectFileName).toFile().getAbsolutePath();
+        FilePrinter.writeToFile(detailedFilename, detailedOutputBuilder.toString());
+    }
+
+    private void writeOutResults(GoldStandardProject goldStandardProject, EvaluationResults<String> results) {
+        Path outputPath = Path.of(InconsistencyDetectionEvaluationIT.OUTPUT);
+        Path idEvalPath = outputPath.resolve(InconsistencyDetectionEvaluationIT.DIRECTORY_NAME);
+        try {
+            Files.createDirectories(outputPath);
+            Files.createDirectories(idEvalPath);
+        } catch (IOException e) {
+            InconsistencyDetectionEvaluationIT.logger.warn("Could not create directories.", e);
+        }
+
+        var outputBuilder = InconsistencyDetectionEvaluationIT.createStringBuilderWithHeader(goldStandardProject);
+        outputBuilder.append(TestUtil.createResultLogString("Inconsistent Model Elements", results));
+        outputBuilder.append(InconsistencyDetectionEvaluationIT.LINE_SEPARATOR);
+        outputBuilder.append("Number of True Positives: ").append(results.truePositives().size());
+        outputBuilder.append(InconsistencyDetectionEvaluationIT.LINE_SEPARATOR);
+        outputBuilder.append("Number of False Positives: ").append(results.falsePositives().size());
+        outputBuilder.append(InconsistencyDetectionEvaluationIT.LINE_SEPARATOR);
+        outputBuilder.append("Number of False Negatives: ").append(results.falseNegatives().size());
+
+        String projectFileName = "inconsistentModelElements_" + goldStandardProject.getProjectName() + ".txt";
+        var filename = idEvalPath.resolve(projectFileName).toFile().getAbsolutePath();
+        FilePrinter.writeToFile(filename, outputBuilder.toString());
     }
 }

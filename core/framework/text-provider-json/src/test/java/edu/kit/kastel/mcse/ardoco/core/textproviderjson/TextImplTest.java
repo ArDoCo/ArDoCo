@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.textproviderjson;
 
 import org.junit.jupiter.api.Assertions;
@@ -26,8 +26,8 @@ class TextImplTest {
     }
 
     @Test
-    void getLengthTest() {
-        Assertions.assertEquals(baselineText.getLength(), textImplInstance.getLength());
+    void getNumberOfWordsTest() {
+        Assertions.assertEquals(baselineText.getNumberOfWords(), textImplInstance.getNumberOfWords());
     }
 
     @Test

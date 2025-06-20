@@ -1,9 +1,10 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.execution;
 
 import java.io.File;
 import java.util.SortedMap;
 
+import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
 import edu.kit.kastel.mcse.ardoco.core.common.util.CommonUtilities;
 import edu.kit.kastel.mcse.ardoco.core.common.util.DataRepositoryHelper;
 import edu.kit.kastel.mcse.ardoco.core.execution.ArDoCo;
@@ -36,7 +37,7 @@ public class ArDoCoForSadCodeTraceabilityLinkRecovery extends ArDoCoRunner {
             throw new IllegalArgumentException("Cannot deal with empty input text. Maybe there was an error reading the file.");
         }
         DataRepositoryHelper.putInputText(dataRepository, text);
-        var codeConfiguration = ArCoTLModelProviderAgent.getCodeConfiguration(inputCode);
+        var codeConfiguration = ArCoTLModelProviderAgent.getCodeConfiguration(inputCode, Metamodel.CODE_WITH_COMPILATION_UNITS_AND_PACKAGES);
         ArCoTLModelProviderAgent arCoTLModelProviderAgent = ArCoTLModelProviderAgent.getArCoTLModelProviderAgent(dataRepository, additionalConfigs, null,
                 codeConfiguration);
         arDoCo.addPipelineStep(arCoTLModelProviderAgent);

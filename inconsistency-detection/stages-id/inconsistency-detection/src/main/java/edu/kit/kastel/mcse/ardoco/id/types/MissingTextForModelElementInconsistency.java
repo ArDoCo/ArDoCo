@@ -1,28 +1,32 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.id.types;
 
+import java.io.Serial;
 import java.util.Locale;
 import java.util.Objects;
 
 import org.eclipse.collections.api.collection.ImmutableCollection;
 import org.eclipse.collections.api.factory.Lists;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.legacy.ModelInstance;
+import edu.kit.kastel.mcse.ardoco.core.api.entity.ModelEntity;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.inconsistency.ModelInconsistency;
 
 public class MissingTextForModelElementInconsistency implements ModelInconsistency {
     private static final String INCONSISTENCY_TYPE_NAME = "MissingTextForModelElement";
+    @Serial
+    private static final long serialVersionUID = 2376071657979892661L;
 
-    private final ModelInstance instance;
+    private final ModelEntity modelEntity;
 
-    public MissingTextForModelElementInconsistency(ModelInstance instance) {
-        this.instance = instance;
+    public MissingTextForModelElementInconsistency(ModelEntity modelEntity) {
+        this.modelEntity = modelEntity;
     }
 
     @Override
     public String getReason() {
-        return String.format(Locale.US, "Model contains an Instance \"%s\" (type: \"%s\")  that seems to be undocumented.", instance.getFullName(), instance
-                .getFullType());
+        return String.format(Locale.US, "Model contains an Instance \"%s\" (type: \"%s\")  that seems to be undocumented.", modelEntity.getName(), modelEntity
+                .getType()
+                .orElseThrow());
     }
 
     @Override
@@ -32,12 +36,12 @@ public class MissingTextForModelElementInconsistency implements ModelInconsisten
 
     @Override
     public String toString() {
-        return "MissingTextForModelElementInconsistency [modelInstance=" + instance + "]";
+        return "MissingTextForModelElementInconsistency [modelInstance=" + modelEntity + "]";
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(instance);
+        return Objects.hash(modelEntity);
     }
 
     @Override
@@ -48,12 +52,12 @@ public class MissingTextForModelElementInconsistency implements ModelInconsisten
         if (!(obj instanceof MissingTextForModelElementInconsistency other)) {
             return false;
         }
-        return Objects.equals(instance, other.instance);
+        return Objects.equals(modelEntity, other.modelEntity);
     }
 
     @Override
     public ImmutableCollection<String[]> toFileOutput() {
-        String[] entry = { getType(), instance.getFullName(), instance.getFullType() };
+        String[] entry = { getType(), modelEntity.getName(), modelEntity.getType().orElseThrow() };
         var list = Lists.mutable.<String[]>empty();
         list.add(entry);
         return list.toImmutable();
@@ -61,16 +65,16 @@ public class MissingTextForModelElementInconsistency implements ModelInconsisten
 
     @Override
     public String getModelInstanceName() {
-        return instance.getFullName();
+        return modelEntity.getName();
     }
 
     @Override
     public String getModelInstanceType() {
-        return instance.getFullType();
+        return modelEntity.getType().orElseThrow();
     }
 
     @Override
     public String getModelInstanceUid() {
-        return instance.getUid();
+        return modelEntity.getId();
     }
 }

@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim;
 
 import java.util.Objects;
@@ -6,9 +6,9 @@ import java.util.Objects;
 import edu.kit.kastel.mcse.ardoco.core.api.text.Word;
 
 /**
- * A ComparisonContext contains all information that can be used for comparing similarity between objects that occur within ArDoCo. The fields
- * {@link #firstString} and {@link #secondString} are always not null. The field {@link #lemmatize} decides whether the lemmatized version of both words should
- * be used for comparison.
+ * Contains all information for comparing similarity between objects in ArDoCo.
+ * The fields {@code firstString} and {@code secondString} are always non-null.
+ * The field {@code lemmatize} decides whether the lemmatized version of both words should be used for comparison.
  */
 public record ComparisonContext(String firstString, String secondString, Word firstWord, Word secondWord, boolean lemmatize) {
 
@@ -45,23 +45,19 @@ public record ComparisonContext(String firstString, String secondString, Word fi
     }
 
     /**
-     * Finds the most appropriate string representation by the first object in this comparison object. This method can be used as a shorthand to avoid going
-     * through all variables that could possibly represent the first object.
+     * Finds the most appropriate string representation for the first object in this comparison.
      *
-     * @return the most appropriate string presentation of the first object in this comparison
+     * @return the most appropriate string representation of the first object
      */
-
     public String firstTerm() {
         return this.findAppropriateTerm(this.firstString, this.firstWord);
     }
 
     /**
-     * Finds the most appropriate string representation by the second object in this comparison object. This method can be used as a shorthand to avoid going
-     * through all variables that could possibly represent the second object.
+     * Finds the most appropriate string representation for the second object in this comparison.
      *
-     * @return the most appropriate string presentation of the second object in this comparison
+     * @return the most appropriate string representation of the second object
      */
-
     public String secondTerm() {
         return this.findAppropriateTerm(this.secondString, this.secondWord);
     }

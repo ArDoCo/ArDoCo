@@ -1,6 +1,7 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.entity;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -9,10 +10,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import edu.kit.kastel.mcse.ardoco.core.common.IdentifierProvider;
 
 /**
- * An entity defines the smallest unit of a trace link.
+ * Abstract base class for entities, the smallest unit of a trace link.
+ * Provides identity, name, and comparison logic.
  */
-public abstract sealed class Entity implements Serializable, Comparable<Entity> permits ArchitectureEntity, TextEntity, CodeEntity {
+public abstract sealed class Entity implements Serializable, Comparable<Entity> permits TextEntity, ModelEntity {
 
+    @Serial
     private static final long serialVersionUID = 5916408204883918465L;
 
     @JsonProperty
@@ -21,6 +24,9 @@ public abstract sealed class Entity implements Serializable, Comparable<Entity> 
     @JsonProperty
     private String name;
 
+    /**
+     * Default constructor for deserialization frameworks.
+     */
     protected Entity() {
         // Jackson
         this(null);
@@ -35,11 +41,22 @@ public abstract sealed class Entity implements Serializable, Comparable<Entity> 
         this(name, IdentifierProvider.createId());
     }
 
+    /**
+     * Creates a new entity with the specified name and id.
+     *
+     * @param name the name of the entity
+     * @param id   the unique identifier
+     */
     protected Entity(String name, String id) {
-        this.id = Objects.requireNonNull(id);
         this.name = name;
+        this.id = Objects.requireNonNull(id);
     }
 
+    /**
+     * Returns the unique identifier of the entity.
+     *
+     * @return the entity's id
+     */
     public String getId() {
         return this.id;
     }
@@ -81,4 +98,5 @@ public abstract sealed class Entity implements Serializable, Comparable<Entity> 
         }
         return this.id.compareTo(o.id);
     }
+
 }

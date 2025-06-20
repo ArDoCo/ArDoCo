@@ -1,4 +1,4 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.text;
 
 import java.io.Serializable;
@@ -6,83 +6,87 @@ import java.io.Serializable;
 import org.eclipse.collections.api.list.ImmutableList;
 
 /**
- * The Interface IWord defines a word in a text.
+ * Represents a word in a text.
  */
 public interface Word extends Comparable<Word>, Serializable {
 
     /**
-     * Gets the sentence number starting at 0.
+     * Returns the sentence number (starting at 0).
      *
      * @return the sentence number
      */
-    int getSentenceNo();
+    int getSentenceNumber();
 
     /**
-     * Return the sentence the word is contained in
+     * Returns the sentence containing this word.
      *
-     * @return the sentence the word is contained in
+     * @return the sentence
      */
     Sentence getSentence();
 
     /**
-     * Gets the text representation of the word.
+     * Returns the text of the word.
      *
      * @return the text
      */
     String getText();
 
     /**
-     * Gets the pos tag.
+     * Returns the POS tag of the word.
      *
-     * @return the pos tag
+     * @return the POS tag
      */
     POSTag getPosTag();
 
     /**
-     * Gets the previous word.
+     * Returns the previous word in the sentence.
      *
      * @return the previous word
      */
     Word getPreWord();
 
     /**
-     * Gets the next word.
+     * Returns the next word in the sentence.
      *
      * @return the next word
      */
     Word getNextWord();
 
     /**
-     * FIXME This description is confusing. Is this relative to the sentence or relative to the entire text?
-     * Gets the position in the sentence / text.
+     * Returns the position of the word in the entire text.
      *
      * @return the position
      */
     int getPosition();
 
     /**
-     * Gets the lemmatized version of the word.
+     * Returns the lemmatized form of the word.
      *
      * @return the lemma
      */
     String getLemma();
 
     /**
-     * Gets the words that are dependency of this.
+     * Returns outgoing dependency words of this word for the given dependency tag.
      *
      * @param dependencyTag the dependency tag
-     * @return the words that are dependency of this
+     * @return outgoing dependency words
      */
     ImmutableList<Word> getOutgoingDependencyWordsWithType(DependencyTag dependencyTag);
 
     /**
-     * Gets the words that are dependent on this.
+     * Returns incoming dependency words of this word for the given dependency tag.
      *
      * @param dependencyTag the dependency tag
-     * @return the words that are dependent on this
+     * @return incoming dependency words
      */
     ImmutableList<Word> getIncomingDependencyWordsWithType(DependencyTag dependencyTag);
 
+    /**
+     * Returns the phrase containing this word.
+     *
+     * @return the phrase
+     */
     Phrase getPhrase();
 
     @Override
@@ -90,7 +94,7 @@ public interface Word extends Comparable<Word>, Serializable {
         if (this.equals(o))
             return 0;
 
-        int compareSentences = Integer.compare(this.getSentenceNo(), o.getSentenceNo());
+        int compareSentences = Integer.compare(this.getSentenceNumber(), o.getSentenceNumber());
         if (compareSentences != 0) {
             return compareSentences;
         }

@@ -1,26 +1,36 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.tracelink;
 
+import java.io.Serial;
 import java.util.Objects;
 import java.util.Optional;
 
 import edu.kit.kastel.mcse.ardoco.core.api.entity.Entity;
 
-public final class TransitiveTraceLink<A extends Entity, M extends Entity, B extends Entity> extends TraceLink<A, B> {
+/**
+ * A trace link that represents a transitive relationship between two entities through an intermediate entity.
+ * This class combines two trace links to create a single trace link from the first endpoint of the first link
+ * to the second endpoint of the second link.
+ *
+ * @param <A> the type of the first entity
+ * @param <B> the type of the second entity
+ */
+public final class TransitiveTraceLink<A extends Entity, B extends Entity> extends TraceLink<A, B> {
 
+    @Serial
     private static final long serialVersionUID = 3781827633038556211L;
 
-    private final TraceLink<A, M> firstTraceLink;
-    private final TraceLink<M, B> secondTraceLink;
+    private final TraceLink<A, ?> firstTraceLink;
+    private final TraceLink<?, B> secondTraceLink;
 
-    private TransitiveTraceLink(TraceLink<A, M> firstTraceLink, TraceLink<M, B> secondTraceLink) {
+    private TransitiveTraceLink(TraceLink<A, ?> firstTraceLink, TraceLink<?, B> secondTraceLink) {
         super(firstTraceLink.getFirstEndpoint(), secondTraceLink.getSecondEndpoint());
         this.firstTraceLink = firstTraceLink;
         this.secondTraceLink = secondTraceLink;
     }
 
-    public static <A extends Entity, M extends Entity, B extends Entity> Optional<TransitiveTraceLink<A, M, B>> createTransitiveTraceLink(
-            TraceLink<A, M> firstTraceLink, TraceLink<M, B> secondTraceLink) {
+    public static <A extends Entity, B extends Entity> Optional<TransitiveTraceLink<A, B>> createTransitiveTraceLink(
+            TraceLink<A, ? extends Entity> firstTraceLink, TraceLink<? extends Entity, B> secondTraceLink) {
         if (TransitiveTraceLink.isValidTransitiveTraceLink(firstTraceLink, secondTraceLink)) {
             return Optional.of(new TransitiveTraceLink<>(firstTraceLink, secondTraceLink));
         }
@@ -33,11 +43,11 @@ public final class TransitiveTraceLink<A extends Entity, M extends Entity, B ext
         return secondEndpointOfFirstTl.equals(firstEndpointOfSecondTl);
     }
 
-    public TraceLink<A, M> getFirstTraceLink() {
+    public TraceLink<A, ?> getFirstTraceLink() {
         return this.firstTraceLink;
     }
 
-    public TraceLink<M, B> getSecondTraceLink() {
+    public TraceLink<?, B> getSecondTraceLink() {
         return this.secondTraceLink;
     }
 
@@ -51,7 +61,7 @@ public final class TransitiveTraceLink<A extends Entity, M extends Entity, B ext
         if (this == obj) {
             return true;
         }
-        if (!(obj instanceof TransitiveTraceLink<?, ?, ?> other)) {
+        if (!(obj instanceof TransitiveTraceLink<?, ?> other)) {
             return false;
         }
         return Objects.equals(this.getFirstTraceLink(), other.getFirstTraceLink()) && //

@@ -1,6 +1,7 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.id.types;
 
+import java.io.Serial;
 import java.util.Locale;
 import java.util.Objects;
 
@@ -8,29 +9,31 @@ import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
 import org.eclipse.collections.api.list.MutableList;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.legacy.ModelInstance;
+import edu.kit.kastel.mcse.ardoco.core.api.entity.Entity;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.inconsistency.TextInconsistency;
 import edu.kit.kastel.mcse.ardoco.core.api.text.Word;
 
 public class NameInconsistency implements TextInconsistency {
 
     private static final String INCONSISTENCY_TYPE_NAME = "NameInconsistency";
+    @Serial
+    private static final long serialVersionUID = 7248818574943312593L;
 
-    private final ModelInstance modelInstance;
+    private final Entity entity;
     private final Word word;
     private final int sentenceNo;
 
-    public NameInconsistency(ModelInstance modelInstance, Word word) {
-        this.modelInstance = modelInstance;
+    public NameInconsistency(Entity entity, Word word) {
+        this.entity = entity;
         this.word = word;
-        sentenceNo = word.getSentenceNo() + 1;
+        sentenceNo = word.getSentenceNumber() + 1;
     }
 
     @Override
     public String getReason() {
         String textOccurrence = word.getText();
-        String modelOccurrence = modelInstance.getFullName();
-        String uid = modelInstance.getUid();
+        String modelOccurrence = entity.getName();
+        String uid = entity.getId();
         return String.format(Locale.US, "Inconsistent naming in trace link between textual occurence \"%s\" and model element \"%s\" (%s)", textOccurrence,
                 modelOccurrence, uid);
     }
@@ -43,8 +46,8 @@ public class NameInconsistency implements TextInconsistency {
     @Override
     public ImmutableList<String[]> toFileOutput() {
         MutableList<String[]> returnList = Lists.mutable.empty();
-        var modelUid = modelInstance.getUid();
-        returnList.add(new String[] { getType(), Integer.toString(sentenceNo), word.getText(), modelInstance.getFullName(), modelUid });
+        var modelUid = entity.getId();
+        returnList.add(new String[] { getType(), Integer.toString(sentenceNo), word.getText(), entity.getName(), modelUid });
         return returnList.toImmutable();
     }
 
@@ -55,7 +58,7 @@ public class NameInconsistency implements TextInconsistency {
 
     @Override
     public int hashCode() {
-        return Objects.hash(modelInstance, word);
+        return Objects.hash(entity, word);
     }
 
     @Override
@@ -66,7 +69,7 @@ public class NameInconsistency implements TextInconsistency {
         if (!(obj instanceof NameInconsistency other)) {
             return false;
         }
-        return Objects.equals(modelInstance, other.modelInstance) && Objects.equals(word, other.word);
+        return Objects.equals(entity, other.entity) && Objects.equals(word, other.word);
     }
 
 }

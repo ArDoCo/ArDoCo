@@ -1,10 +1,11 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.execution;
 
 import java.io.File;
 import java.util.SortedMap;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.ArchitectureModelType;
+import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
+import edu.kit.kastel.mcse.ardoco.core.api.models.ModelFormat;
 import edu.kit.kastel.mcse.ardoco.core.common.util.CommonUtilities;
 import edu.kit.kastel.mcse.ardoco.core.common.util.DataRepositoryHelper;
 import edu.kit.kastel.mcse.ardoco.core.execution.ArDoCo;
@@ -24,14 +25,14 @@ public class ArDoCoForSadSamCodeTraceabilityLinkRecovery extends ArDoCoRunner {
         super(projectName);
     }
 
-    public void setUp(File inputText, File inputArchitectureModel, ArchitectureModelType architectureModelType, File inputCode,
-            SortedMap<String, String> additionalConfigs, File outputDir) {
-        definePipeline(inputText, inputArchitectureModel, architectureModelType, inputCode, additionalConfigs);
+    public void setUp(File inputText, File inputArchitectureModel, ModelFormat modelFormat, File inputCode, SortedMap<String, String> additionalConfigs,
+            File outputDir) {
+        definePipeline(inputText, inputArchitectureModel, modelFormat, inputCode, additionalConfigs);
         setOutputDirectory(outputDir);
         isSetUp = true;
     }
 
-    private void definePipeline(File inputText, File inputArchitectureModel, ArchitectureModelType architectureModelType, File inputCode,
+    private void definePipeline(File inputText, File inputArchitectureModel, ModelFormat modelFormat, File inputCode,
             SortedMap<String, String> additionalConfigs) {
         ArDoCo arDoCo = this.getArDoCo();
         var dataRepository = arDoCo.getDataRepository();
@@ -44,8 +45,8 @@ public class ArDoCoForSadSamCodeTraceabilityLinkRecovery extends ArDoCoRunner {
 
         arDoCo.addPipelineStep(TextPreprocessingAgent.get(additionalConfigs, dataRepository));
 
-        var architectureConfiguration = new ArchitectureConfiguration(inputArchitectureModel, architectureModelType);
-        var codeConfiguration = ArCoTLModelProviderAgent.getCodeConfiguration(inputCode);
+        var architectureConfiguration = new ArchitectureConfiguration(inputArchitectureModel, modelFormat, Metamodel.ARCHITECTURE_ONLY_COMPONENTS);
+        var codeConfiguration = ArCoTLModelProviderAgent.getCodeConfiguration(inputCode, Metamodel.CODE_ONLY_COMPILATION_UNITS);
 
         ArCoTLModelProviderAgent arCoTLModelProviderAgent = ArCoTLModelProviderAgent.getArCoTLModelProviderAgent(dataRepository, additionalConfigs,
                 architectureConfiguration, codeConfiguration);

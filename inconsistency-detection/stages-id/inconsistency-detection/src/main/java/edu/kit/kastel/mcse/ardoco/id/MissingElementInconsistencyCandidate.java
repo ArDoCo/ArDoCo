@@ -1,6 +1,7 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.id;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -11,6 +12,8 @@ import edu.kit.kastel.mcse.ardoco.core.api.stage.recommendationgenerator.Recomme
 
 public class MissingElementInconsistencyCandidate implements Serializable {
 
+    @Serial
+    private static final long serialVersionUID = 6718278829646931607L;
     private final RecommendedInstance recommendedInstance;
     private final MutableSortedSet<MissingElementSupport> supports = SortedSets.mutable.empty();
 

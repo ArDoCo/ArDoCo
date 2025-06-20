@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.models.arcotl;
 
 import java.util.ArrayList;
@@ -7,43 +7,42 @@ import java.util.List;
 import java.util.Objects;
 import java.util.SortedSet;
 
-import com.fasterxml.jackson.annotation.JsonGetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
 import edu.kit.kastel.mcse.ardoco.core.api.entity.Entity;
-import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeCompilationUnit;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItem;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItemRepository;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodePackage;
 
 /**
- * A code model that is a CMTL instance.
+ * Represents a code model that is a CMTL instance.
+ * Provides access to code items and code packages.
  */
-public final class CodeModel extends Model {
+public abstract sealed class CodeModel extends Model permits CodeModelWithCompilationUnitsAndPackages, CodeModelWithOnlyCompilationUnits {
 
-    @JsonProperty
-    private CodeItemRepository codeItemRepository;
+    protected CodeItemRepository codeItemRepository;
 
-    @JsonProperty
-    private List<String> content;
+    protected List<String> content;
 
-    @JsonIgnore
     private boolean initialized;
 
-    @SuppressWarnings("unused")
-    private CodeModel() {
-        // Jackson
-        this.initialized = false;
+    /**
+     * Creates a new code model with the specified code item repository and content IDs.
+     *
+     * @param codeItemRepository the code item repository
+     * @param content            list of code item IDs
+     */
+    protected CodeModel(CodeItemRepository codeItemRepository, List<String> content) {
+        this.initialized = true;
+        this.codeItemRepository = codeItemRepository;
+        this.content = new ArrayList<>(content);
     }
 
     /**
-     * Creates a new code model that is a CMTL instance. The model has the specified code items as content.
+     * Creates a new code model with the specified code item repository and content.
      *
-     * @param content the content of the code model
+     * @param codeItemRepository the code item repository
+     * @param content            set of code items
      */
-    public CodeModel(CodeItemRepository codeItemRepository, SortedSet<? extends CodeItem> content) {
+    protected CodeModel(CodeItemRepository codeItemRepository, SortedSet<? extends CodeItem> content) {
         this.initialized = true;
         this.codeItemRepository = codeItemRepository;
         this.content = new ArrayList<>();
@@ -52,39 +51,35 @@ public final class CodeModel extends Model {
         }
     }
 
-    @Override
-    public Metamodel getMetamodel() {
-        return Metamodel.CODE;
+    /**
+     * Creates a DTO for this code model.
+     *
+     * @return code model DTO
+     */
+    public CodeModelDTO createCodeModelDTO() {
+        return new CodeModelDTO(codeItemRepository, getContentIds());
     }
 
-    @JsonGetter("content")
-    protected List<String> getContentIds() {
+    private List<String> getContentIds() {
         this.initialize();
         return this.content;
     }
 
     @Override
-    public List<? extends CodeItem> getContent() {
-        this.initialize();
-        return this.codeItemRepository.getCodeItemsFromIds(this.content);
-    }
+    public abstract List<? extends CodeItem> getContent();
 
     @Override
-    public List<? extends CodeCompilationUnit> getEndpoints() {
-        List<CodeCompilationUnit> compilationUnits = new ArrayList<>();
-        this.getContent().forEach(c -> compilationUnits.addAll(c.getAllCompilationUnits()));
-        return compilationUnits;
-    }
+    public abstract List<? extends CodeItem> getEndpoints();
 
     /**
      * Returns all code packages directly or indirectly owned by this code model.
      *
-     * @return all code packages of this code model
+     * @return list of all code packages
      */
     public List<? extends CodePackage> getAllPackages() {
         List<CodePackage> codePackages = new ArrayList<>();
         var lContent = this.getContent();
-        for (CodeItem c : lContent) {
+        for (var c : lContent) {
             var allPackages = c.getAllPackages();
             for (CodePackage cp : allPackages) {
                 if (!codePackages.contains(cp)) {
@@ -96,7 +91,10 @@ public final class CodeModel extends Model {
         return codePackages;
     }
 
-    private synchronized void initialize() {
+    /**
+     * Initializes the code model if not already initialized.
+     */
+    protected synchronized void initialize() {
         if (this.initialized) {
             return;
         }
@@ -104,6 +102,12 @@ public final class CodeModel extends Model {
         this.initialized = true;
     }
 
+    /**
+     * Checks equality with another object.
+     *
+     * @param o the object to compare
+     * @return true if equal, false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -115,6 +119,11 @@ public final class CodeModel extends Model {
         return Objects.equals(this.content, codeModel.content);
     }
 
+    /**
+     * Returns the hash code for this code model.
+     *
+     * @return hash code
+     */
     @Override
     public int hashCode() {
         int result = super.hashCode();

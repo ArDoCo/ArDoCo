@@ -1,6 +1,7 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -13,6 +14,10 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+/**
+ * Represents a module in the code model.
+ * Can contain other code items, such as packages, compilation units, or assemblies.
+ */
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "type")
 @JsonSubTypes({ //
         @JsonSubTypes.Type(value = CodeAssembly.class, name = "CodeAssembly"),//
@@ -22,6 +27,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("CodeModule")
 public sealed class CodeModule extends CodeItem permits CodeAssembly, CodeCompilationUnit, CodePackage {
 
+    @Serial
     private static final long serialVersionUID = -7941299662945801101L;
 
     @JsonProperty
@@ -33,6 +39,13 @@ public sealed class CodeModule extends CodeItem permits CodeAssembly, CodeCompil
         // Jackson
     }
 
+    /**
+     * Creates a new code module with the specified name and content.
+     *
+     * @param codeItemRepository the code item repository
+     * @param name               the name of the code module
+     * @param content            the content of the code module
+     */
     public CodeModule(CodeItemRepository codeItemRepository, String name, SortedSet<? extends CodeItem> content) {
         super(codeItemRepository, name);
         this.content = new ArrayList<>();
@@ -42,16 +55,31 @@ public sealed class CodeModule extends CodeItem permits CodeAssembly, CodeCompil
         this.parentId = null;
     }
 
+    /**
+     * Returns the content IDs of this code module.
+     *
+     * @return list of content IDs
+     */
     @JsonGetter("content")
     protected List<String> getContentIds() {
         return this.content;
     }
 
+    /**
+     * Returns the content of this code module as a list of code items.
+     *
+     * @return list of code items
+     */
     @Override
     public List<CodeItem> getContent() {
         return this.codeItemRepository.getCodeItemsFromIds(this.content);
     }
 
+    /**
+     * Sets the content of this code module.
+     *
+     * @param content list of code items to set as content
+     */
     public void setContent(List<? extends CodeItem> content) {
         this.content = new ArrayList<>();
         for (var codeItem : content) {
@@ -59,14 +87,29 @@ public sealed class CodeModule extends CodeItem permits CodeAssembly, CodeCompil
         }
     }
 
+    /**
+     * Adds a code item to the content of this code module.
+     *
+     * @param content the code item to add
+     */
     public void addContent(CodeItem content) {
         this.content.add(content.getId());
     }
 
+    /**
+     * Adds a list of code items to the content of this code module.
+     *
+     * @param content list of code items to add
+     */
     public void addContent(List<? extends CodeItem> content) {
         this.content.addAll(content.stream().map(CodeItem::getId).toList());
     }
 
+    /**
+     * Returns the parent code module of this code module, if any.
+     *
+     * @return parent code module, or null if none
+     */
     public CodeModule getParent() {
         CodeItem codeItem = this.codeItemRepository.getCodeItem(this.parentId);
         if (codeItem instanceof CodeModule codeModule) {
@@ -75,10 +118,20 @@ public sealed class CodeModule extends CodeItem permits CodeAssembly, CodeCompil
         return null;
     }
 
+    /**
+     * Checks if this code module has a parent.
+     *
+     * @return true if this code module has a parent, false otherwise
+     */
     public boolean hasParent() {
         return this.getParent() != null;
     }
 
+    /**
+     * Sets the parent code module for this code module.
+     *
+     * @param parent the parent code module to set
+     */
     public void setParent(CodeModule parent) {
         this.parentId = parent.getId();
         if (!this.codeItemRepository.containsCodeItem(this.parentId)) {
@@ -86,6 +139,11 @@ public sealed class CodeModule extends CodeItem permits CodeAssembly, CodeCompil
         }
     }
 
+    /**
+     * Returns all compilation units in this code module as a sorted set.
+     *
+     * @return sorted set of compilation units
+     */
     @Override
     public SortedSet<CodeCompilationUnit> getAllCompilationUnits() {
         SortedSet<CodeCompilationUnit> result = new TreeSet<>();
@@ -93,6 +151,11 @@ public sealed class CodeModule extends CodeItem permits CodeAssembly, CodeCompil
         return result;
     }
 
+    /**
+     * Returns all code packages in this code module as a sorted set.
+     *
+     * @return sorted set of code packages
+     */
     @Override
     public SortedSet<CodePackage> getAllPackages() {
         SortedSet<CodePackage> result = new TreeSet<>();
@@ -100,6 +163,12 @@ public sealed class CodeModule extends CodeItem permits CodeAssembly, CodeCompil
         return result;
     }
 
+    /**
+     * Checks equality with another object.
+     *
+     * @param o the object to compare
+     * @return true if equal, false otherwise
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -111,6 +180,11 @@ public sealed class CodeModule extends CodeItem permits CodeAssembly, CodeCompil
         return Objects.equals(this.content, that.content);
     }
 
+    /**
+     * Returns the hash code for this code module.
+     *
+     * @return hash code
+     */
     @Override
     public int hashCode() {
         int result = super.hashCode();

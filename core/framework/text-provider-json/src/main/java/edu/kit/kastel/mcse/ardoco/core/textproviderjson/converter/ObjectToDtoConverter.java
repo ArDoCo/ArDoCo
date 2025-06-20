@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.textproviderjson.converter;
 
 import java.io.IOException;
@@ -74,7 +74,7 @@ public class ObjectToDtoConverter {
 
     private WordDto convertToWordDTO(Word word) throws NotConvertableException {
         WordDto wordDTO = new WordDto();
-        wordDTO.setId(word.getPosition() + (long) 1);
+        wordDTO.setId(word.getPosition() + 1L);
         wordDTO.setText(word.getText());
         wordDTO.setLemma(word.getLemma());
         try {
@@ -82,7 +82,7 @@ public class ObjectToDtoConverter {
         } catch (IOException e) {
             throw new NotConvertableException(String.format("IOException when converting word with id %d to WordDto: PosTag not found.", wordDTO.getId()));
         }
-        wordDTO.setSentenceNo(word.getSentenceNo() + (long) 1);
+        wordDTO.setSentenceNo(word.getSentenceNumber() + 1L);
         List<DependencyImpl> inDep = new ArrayList<>();
         List<DependencyImpl> outDep = new ArrayList<>();
         for (DependencyTag depType : DependencyTag.values()) {

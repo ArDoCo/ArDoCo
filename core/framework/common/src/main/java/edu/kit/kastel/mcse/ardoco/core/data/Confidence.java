@@ -1,6 +1,7 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,17 +13,16 @@ import java.util.stream.Collectors;
 
 import edu.kit.kastel.mcse.ardoco.core.architecture.Deterministic;
 import edu.kit.kastel.mcse.ardoco.core.common.AggregationFunctions;
-import edu.kit.kastel.mcse.ardoco.core.common.ICopyable;
 import edu.kit.kastel.mcse.ardoco.core.common.tuple.Triple;
 import edu.kit.kastel.mcse.ardoco.core.pipeline.agent.Claimant;
 
 /**
- * This class represents a confidence for a certain (intermediate) result. Different {@link Claimant Claimants} can add their confidences that get aggregated
- * via one of the {@link AggregationFunctions} to a single confidence value.
+ * Represents a confidence value for a result, aggregating confidences from multiple claimants using a specified aggregation function.
  */
 @Deterministic
-public final class Confidence implements Comparable<Confidence>, ICopyable<Confidence>, Serializable {
+public final class Confidence implements Comparable<Confidence>, Serializable {
 
+    @Serial
     private static final long serialVersionUID = 4307327201754195030L;
 
     private final AggregationFunctions confidenceAggregator;
@@ -70,7 +70,11 @@ public final class Confidence implements Comparable<Confidence>, ICopyable<Confi
         return identitySet;
     }
 
-    @Override
+    /**
+     * Creates a copy of this confidence object.
+     *
+     * @return a new instance of Confidence with the same properties
+     */
     public Confidence createCopy() {
         return new Confidence(this.confidenceAggregator, this.agentConfidences);
     }

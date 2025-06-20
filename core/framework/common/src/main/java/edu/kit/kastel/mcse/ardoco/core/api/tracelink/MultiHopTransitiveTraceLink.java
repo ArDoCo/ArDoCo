@@ -1,6 +1,7 @@
-/* Licensed under MIT 2024. */
+/* Licensed under MIT 2024-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.tracelink;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -11,8 +12,16 @@ import org.slf4j.LoggerFactory;
 
 import edu.kit.kastel.mcse.ardoco.core.api.entity.Entity;
 
+/**
+ * A trace link representing a transitive relationship between two entities over multiple intermediate entities.
+ * This class combines a sequence of trace links to create a single link from the first endpoint to the last endpoint.
+ *
+ * @param <A> the type of the first entity
+ * @param <B> the type of the last entity
+ */
 public final class MultiHopTransitiveTraceLink<A extends Entity, B extends Entity> extends TraceLink<A, B> {
 
+    @Serial
     private static final long serialVersionUID = 850583103292008395L;
 
     private static final Logger logger = LoggerFactory.getLogger(MultiHopTransitiveTraceLink.class);

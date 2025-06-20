@@ -1,16 +1,15 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.vector;
 
 import java.util.Objects;
 
 /**
- * Some utility functions for double and float vectors.
+ * Utility functions for double and float vectors.
  */
 public class VectorUtils {
 
     /**
-     * Calculates the cosine similarity between the two given vectors. If both vectors are zero, the resulting
-     * similarity is 1.0. If only one of the vectors is zero, the resulting similarity is 0.0.
+     * Calculates the cosine similarity between two vectors. If both are zero, returns 1.0; if only one is zero, returns 0.0.
      *
      * @param firstVec  the first vector
      * @param secondVec the second vector
@@ -46,7 +45,7 @@ public class VectorUtils {
     }
 
     /**
-     * Calculates the cosine similarity between the two given vectors. The two given vectors must have the same length.
+     * Calculates the cosine similarity between two vectors. The two vectors must have the same length.
      *
      * @param firstVec  the first vector
      * @param secondVec the second vector
@@ -104,7 +103,7 @@ public class VectorUtils {
     }
 
     /**
-     * Adds the given vectors together and stores the resulting vector in the first argument. The two given vectors must
+     * Adds the given vectors together and stores the resulting vector in the first argument. The two vectors must
      * have the same length.
      *
      * @param result the first vector that will also be the result vector after the addition

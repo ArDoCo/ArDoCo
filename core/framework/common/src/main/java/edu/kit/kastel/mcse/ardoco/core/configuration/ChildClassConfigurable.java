@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.configuration;
 
 import java.lang.annotation.Documented;
@@ -8,8 +8,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * This annotation marks a field that is configurable as configured by child class. That means that the key that is used to configure the field is based on the
- * actual class (not on the class where the configurable field is defined).
+ * Annotation to mark a field as configurable based on the child class. The configuration key is based on the actual class, not the declaring class.
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Documented

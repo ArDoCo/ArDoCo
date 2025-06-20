@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2023. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.vector;
 
 import java.nio.ByteBuffer;
@@ -15,13 +15,9 @@ import org.sqlite.SQLiteConfig;
 import edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.WordSimUtils;
 
 /**
- * Manages a connection to a sqlite database that contains vector word embeddings using a very specific schema:
- * <p>
- * A table {@code words} has to exist with two columns: {@code word} and {@code vec}. The {@code word} column must be a
- * unique {@code TEXT} column while the {@code vec} column must be a non-nullable {@code BLOB}.
- * <p>
- * Vector blobs must be stored as a consecutive sequence of floats. The amount of floats in a sequence depends on the
- * dimension of the vectors.
+ * Manages a connection to a SQLite database containing vector word embeddings.
+ * The table {@code words} must have columns {@code word} (TEXT, unique) and {@code vec} (BLOB, non-null).
+ * Vector blobs are stored as consecutive floats.
  */
 public class VectorSqliteDatabase implements WordVectorDataSource, AutoCloseable {
 
@@ -32,11 +28,10 @@ public class VectorSqliteDatabase implements WordVectorDataSource, AutoCloseable
     private final PreparedStatement selectStatement;
 
     /**
-     * Instantiates the {@link VectorSqliteDatabase}. Once instantiated, a connection to the file will be kept open
-     * until {@link #close()} is called on this instance.
+     * Instantiates the database and opens a connection until {@link #close()} is called.
      *
-     * @param sqliteFile the path to the sqlite file
-     * @throws SQLException if connecting to the sqlite database fails
+     * @param sqliteFile the path to the SQLite file
+     * @throws SQLException if connecting to the database fails
      */
     public VectorSqliteDatabase(Path sqliteFile) throws SQLException {
         if (!Files.exists(sqliteFile)) {

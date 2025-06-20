@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.strategy;
 
 import java.util.List;
@@ -7,7 +7,7 @@ import edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.ComparisonConte
 import edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim.WordSimMeasure;
 
 /**
- * A comparison strategy determines how the verdicts of multiple WSMs regarding a specific comparison are combined.
+ * A strategy for combining the verdicts of multiple word similarity measures.
  */
 public interface ComparisonStrategy {
 
@@ -16,12 +16,11 @@ public interface ComparisonStrategy {
     ComparisonStrategy MAJORITY = new MajorityStrategy();
 
     /**
-     * Evaluates whether the words from the given {@link ComparisonContext} are similar by combining the verdicts of the
-     * specified word similarity measures.
+     * Evaluates whether the words from the given context are similar by combining the verdicts of the specified measures.
      *
      * @param ctx      the context containing the words
      * @param measures the measures to use
-     * @return Returns {@code true} if the words are similar.
+     * @return true if the words are similar
      */
     boolean areWordsSimilar(ComparisonContext ctx, List<WordSimMeasure> measures);
 

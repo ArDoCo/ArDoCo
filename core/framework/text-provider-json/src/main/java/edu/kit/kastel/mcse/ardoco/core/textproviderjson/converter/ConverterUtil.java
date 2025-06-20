@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.textproviderjson.converter;
 
 import java.util.List;
@@ -21,7 +21,7 @@ public final class ConverterUtil {
      * @return the direct children of this phrase
      */
     public static List<Phrase> getChildPhrases(Phrase parentPhrase) {
-        List<Phrase> subphrases = parentPhrase.getSubPhrases().toList();
+        List<Phrase> subphrases = parentPhrase.getSubphrases().toList();
         return subphrases.stream().filter(x -> isPhraseOnHighestLevel(subphrases, x)).toList();
     }
 
@@ -38,7 +38,7 @@ public final class ConverterUtil {
 
     private static boolean isPhraseOnHighestLevel(List<Phrase> subphrases, Phrase childPhrase) {
         for (Phrase subphrase : subphrases) {
-            if (childPhrase.isSubPhraseOf(subphrase)) {
+            if (childPhrase.isSubphraseOf(subphrase)) {
                 return false;
             }
         }

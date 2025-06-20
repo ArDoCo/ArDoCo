@@ -1,17 +1,21 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture;
 
+import java.io.Serial;
+import java.util.Optional;
 import java.util.SortedSet;
 
+import org.eclipse.collections.api.list.ImmutableList;
+import org.eclipse.collections.api.list.MutableList;
+
 /**
- * A representation of the model object <i>Component</i> from AMTL. Components
- * are building blocks of a software architecture. A component can contain
- * subcomponents but doesn't have to. A component can provide and require
- * interfaces. Provided interfaces are implemented by the component. Required
- * interfaces specify some functionality that is needed by the component.
+ * A representation of the model object <i>Component</i> from AMTL. Components are building blocks of a software architecture. A component can contain
+ * subcomponents but doesn't have to. A component can provide and require interfaces. Provided interfaces are implemented by the component. Required interfaces
+ * specify some functionality that is needed by the component.
  */
 public final class ArchitectureComponent extends ArchitectureItem {
 
+    @Serial
     private static final long serialVersionUID = -7349058662425121364L;
 
     private final SortedSet<ArchitectureComponent> subcomponents;
@@ -20,6 +24,8 @@ public final class ArchitectureComponent extends ArchitectureItem {
     private final SortedSet<ArchitectureInterface> requiredInterfaces;
     private final String type;
 
+    private final MutableList<String> typeParts;
+
     public ArchitectureComponent(String name, String id, SortedSet<ArchitectureComponent> subcomponents, SortedSet<ArchitectureInterface> providedInterfaces,
             SortedSet<ArchitectureInterface> requiredInterfaces, String type) {
         super(name, id);
@@ -27,6 +33,7 @@ public final class ArchitectureComponent extends ArchitectureItem {
         this.providedInterfaces = providedInterfaces;
         this.requiredInterfaces = requiredInterfaces;
         this.type = type;
+        this.typeParts = splitIdentifierIntoParts(type);
     }
 
     /**
@@ -39,8 +46,7 @@ public final class ArchitectureComponent extends ArchitectureItem {
     }
 
     /**
-     * Returns the provided interfaces of this component. Provided interfaces are
-     * implemented by this component.
+     * Returns the provided interfaces of this component. Provided interfaces are implemented by this component.
      *
      * @return the provided interfaces of this component
      */
@@ -49,8 +55,7 @@ public final class ArchitectureComponent extends ArchitectureItem {
     }
 
     /**
-     * Returns the required interfaces of this component. Required interfaces
-     * specify some functionality that is needed by this component.
+     * Returns the required interfaces of this component. Required interfaces specify some functionality that is needed by this component.
      *
      * @return the required interfaces of this component
      */
@@ -63,8 +68,13 @@ public final class ArchitectureComponent extends ArchitectureItem {
      *
      * @return the type of this component
      */
-    public String getType() {
-        return this.type;
+    public Optional<String> getType() {
+        return Optional.of(this.type);
+    }
+
+    @Override
+    public Optional<ImmutableList<String>> getTypeParts() {
+        return Optional.of(this.typeParts.toImmutable());
     }
 
     @Override
@@ -77,7 +87,8 @@ public final class ArchitectureComponent extends ArchitectureItem {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof ArchitectureComponent that) || !super.equals(o) || !this.subcomponents.equals(that.subcomponents) || !this.providedInterfaces.equals(that.providedInterfaces)) {
+        if (!(o instanceof ArchitectureComponent that) || !super.equals(o) || !this.subcomponents.equals(that.subcomponents) || !this.providedInterfaces.equals(
+                that.providedInterfaces)) {
             return false;
         }
         return this.requiredInterfaces.equals(that.requiredInterfaces);

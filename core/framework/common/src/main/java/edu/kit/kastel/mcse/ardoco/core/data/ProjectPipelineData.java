@@ -1,14 +1,18 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.data;
 
 /**
- * {@link ProjectPipelineData} represents data that we know overall about the project such as the name of the project.
+ * Represents data about the overall project, such as the project name.
  */
 public interface ProjectPipelineData extends PipelineStepData {
+
+    /**
+     * Identifier for project pipeline data.
+     */
     String ID = "ProjectPipelineData";
 
     /**
-     * Return the project name
+     * Returns the project name.
      *
      * @return the project name
      */

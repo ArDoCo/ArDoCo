@@ -1,6 +1,7 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.textproviderjson.textobject;
 
+import java.io.Serial;
 import java.util.List;
 import java.util.Objects;
 
@@ -16,6 +17,8 @@ import edu.kit.kastel.mcse.ardoco.core.api.text.Word;
 
 public class WordImpl implements Word {
 
+    @Serial
+    private static final long serialVersionUID = 411612592257031380L;
     private final Text parent;
     private final int indexInText;
     private Word preWord;
@@ -45,7 +48,7 @@ public class WordImpl implements Word {
     }
 
     @Override
-    public int getSentenceNo() {
+    public int getSentenceNumber() {
         return sentenceNo;
     }
 
@@ -76,7 +79,7 @@ public class WordImpl implements Word {
     @Override
     public Word getNextWord() {
         int nextWordIndex = indexInText + 1;
-        if (nextWord == null && nextWordIndex < parent.getLength()) {
+        if (nextWord == null && nextWordIndex < parent.getNumberOfWords()) {
             nextWord = parent.getWord(nextWordIndex);
         }
         return nextWord;
@@ -119,7 +122,7 @@ public class WordImpl implements Word {
         var subPhrases = List.of(currentPhrase);
         while (!subPhrases.isEmpty()) {
             currentPhrase = subPhrases.getFirst();
-            subPhrases = currentPhrase.getSubPhrases().toList().stream().filter(p -> p.getContainedWords().contains(this)).toList();
+            subPhrases = currentPhrase.getSubphrases().toList().stream().filter(p -> p.getContainedWords().contains(this)).toList();
         }
         return currentPhrase;
     }

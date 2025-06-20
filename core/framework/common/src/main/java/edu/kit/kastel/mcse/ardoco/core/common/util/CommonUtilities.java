@@ -1,4 +1,4 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.util;
 
 import java.io.File;
@@ -22,7 +22,7 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.legacy.LegacyModelExtractionState;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.Model;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.recommendationgenerator.RecommendationState;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.recommendationgenerator.RecommendedInstance;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.textextraction.NounMapping;
@@ -32,12 +32,14 @@ import edu.kit.kastel.mcse.ardoco.core.common.similarity.SimilarityUtils;
 import edu.kit.kastel.mcse.ardoco.core.pipeline.agent.Claimant;
 
 /**
- * General helper class for outsourced, common methods.
+ * General helper class for common utility methods used throughout the framework.
  */
 public final class CommonUtilities {
-    private static final Logger logger = LoggerFactory.getLogger(CommonUtilities.class);
-
+    /**
+     * Formatter for date and time output (pattern: yyyy-MM-dd HH:mm).
+     */
     public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm");
+    private static final Logger logger = LoggerFactory.getLogger(CommonUtilities.class);
 
     private CommonUtilities() {
         throw new IllegalAccessError();
@@ -48,7 +50,7 @@ public final class CommonUtilities {
      *
      * @param d1 value 1
      * @param d2 value 2
-     * @return <code>true</code> iff similar enough to be equal
+     * @return true iff similar enough to be equal
      */
     public static boolean valueEqual(double d1, double d2) {
         return Math.abs(d1 - d2) < 1E-8;
@@ -98,7 +100,7 @@ public final class CommonUtilities {
     }
 
     /**
-     * Calculates the root mean square between two given values
+     * Calculates the root mean square between two given values.
      *
      * @param first  the first value
      * @param second the second value
@@ -109,7 +111,7 @@ public final class CommonUtilities {
     }
 
     /**
-     * Calculates the root mean square between the given values
+     * Calculates the root mean square between the given values.
      *
      * @param values List of doubles that should be used to calculate their mean
      * @return the root mean square of the given values
@@ -120,21 +122,21 @@ public final class CommonUtilities {
     }
 
     /**
-     * Calculates the cubic mean between two given values
+     * Calculates the cubic mean between two given values.
      *
      * @param first  the first value
      * @param second the second value
-     * @return the root mean square of the given values
+     * @return the cubic mean of the given values
      */
     public static double cubicMean(double first, double second) {
         return Math.cbrt((Math.pow(first, 3) + Math.pow(second, 3)) / 2);
     }
 
     /**
-     * Calculates the cubic mean between the given values
+     * Calculates the cubic mean between the given values.
      *
      * @param values List of doubles that should be used to calculate their mean
-     * @return the root mean square of the given values
+     * @return the cubic mean of the given values
      */
     public static double cubicMean(List<Double> values) {
         var cubedValuesSum = values.stream().mapToDouble(d -> Math.pow(d, 3)).sum();
@@ -142,7 +144,7 @@ public final class CommonUtilities {
     }
 
     /**
-     * Calculates the power mean (or generalized mean) between the given values
+     * Calculates the power mean (or generalized mean) between the given values.
      *
      * @param first  the first value
      * @param second the second value
@@ -154,7 +156,7 @@ public final class CommonUtilities {
     }
 
     /**
-     * Calculates the power mean (or generalized mean) between the given values
+     * Calculates the power mean (or generalized mean) between the given values.
      *
      * @param values List of doubles that should be used to calculate their mean
      * @param power  the power to use
@@ -195,9 +197,8 @@ public final class CommonUtilities {
     }
 
     /**
-     * Creates {@link RecommendedInstance}s for the given {@link NounMapping}s using the given information about similar
-     * types and probability and type mappings. Adds the created {@link RecommendedInstance}s to the given
-     * {@link RecommendationState}
+     * Creates {@link RecommendedInstance}s for the given {@link NounMapping}s using the given information about similar types and probability and type
+     * mappings. Adds the created {@link RecommendedInstance}s to the given {@link RecommendationState}.
      *
      * @param similarTypes        The list of similar types
      * @param nameMappings        the noun mappings
@@ -219,36 +220,35 @@ public final class CommonUtilities {
     /**
      * Retrieves a list of similar types in the given model state given the word.
      *
-     * @param word       the word that might have type names in the model state
-     * @param modelState the model state containing information about types
+     * @param word  the word that might have type names in the model state
+     * @param model the model containing information about types
      * @return List of type names in the model state that are similar to the given word
      */
-    public static ImmutableList<String> getSimilarTypes(Word word, LegacyModelExtractionState modelState) {
-        var identifiers = getTypeIdentifiers(modelState);
+    public static ImmutableList<String> getSimilarTypes(Word word, Model model) {
+        var identifiers = getSplittedTypeIdentifiers(model);
         return Lists.immutable.fromStream(identifiers.stream().filter(typeId -> SimilarityUtils.getInstance().areWordsSimilar(typeId, word.getText())));
     }
 
     /**
-     * Returns a set of identifiers for the types in the model state.
+     * Returns a set of identifiers for the types in the model.
      *
-     * @param modelState the model state
+     * @param model the model containing type information
      * @return Set of identifiers for existing types
      */
-    public static SortedSet<String> getTypeIdentifiers(LegacyModelExtractionState modelState) {
-        SortedSet<String> identifiers = modelState.getInstanceTypes()
+    public static SortedSet<String> getSplittedTypeIdentifiers(Model model) {
+        SortedSet<String> identifiers = model.getTypeIdentifiers()
                 .stream()
                 .map(CommonUtilities::splitSnakeAndKebabCase)
                 .map(CommonUtilities::splitCamelCase)
                 .map(type -> type.split(" "))
                 .flatMap(Arrays::stream)
                 .collect(Collectors.toCollection(TreeSet::new));
-        identifiers.addAll(modelState.getInstanceTypes().toSet());
+        identifiers.addAll(model.getTypeIdentifiers());
         return identifiers;
     }
 
     /**
-     * Splits a given String at Snake and Kebab cases. For example, "test-string" and "test_string" become "test
-     * string".
+     * Splits a given String at Snake and Kebab cases. For example, "test-string" and "test_string" become "test string".
      *
      * @param name the given name
      * @return the name split at snake and kebab case
@@ -276,7 +276,7 @@ public final class CommonUtilities {
     }
 
     /**
-     * Splits a given String using {@link #splitCamelCase(String)} and {@link #splitSnakeAndKebabCase(String)}
+     * Splits a given String using {@link #splitCamelCase(String)} and {@link #splitSnakeAndKebabCase(String)}.
      *
      * @param name the given name
      * @return the split name
@@ -286,10 +286,10 @@ public final class CommonUtilities {
     }
 
     /**
-     * Checks if the given name is a CamelCased-word
+     * Checks if the given name is a CamelCased-word.
      *
      * @param name the name to check
-     * @return <code>true</code> if the given name is CamelCased
+     * @return true if the given name is CamelCased
      */
     public static boolean nameIsCamelCased(String name) {
         var unCamelCased = CommonUtilities.splitCamelCase(name);
@@ -297,10 +297,10 @@ public final class CommonUtilities {
     }
 
     /**
-     * Checks if the given name is a snake_cased-word
+     * Checks if the given name is a snake_cased-word.
      *
      * @param name the name to check
-     * @return <code>true</code> if the given name is snake_cased
+     * @return true if the given name is snake_cased
      */
     public static boolean nameIsSnakeCased(String name) {
         var split = name.split("_");
@@ -308,10 +308,10 @@ public final class CommonUtilities {
     }
 
     /**
-     * Checks if the given name is a kebab-cased-word
+     * Checks if the given name is a kebab-cased-word.
      *
      * @param name the name to check
-     * @return <code>true</code> if the given name is kebab-cased
+     * @return true if the given name is kebab-cased
      */
     public static boolean nameIsKebabCased(String name) {
         var split = name.split("-");
@@ -319,7 +319,7 @@ public final class CommonUtilities {
     }
 
     /**
-     * Creates a reference given a list of words (compoundWords)
+     * Creates a reference given a list of words (compoundWords).
      *
      * @param compoundWords the given compoundWords
      * @return a reference that consists of the words in the given compoundWords
@@ -333,6 +333,12 @@ public final class CommonUtilities {
         return referenceJoiner.toString();
     }
 
+    /**
+     * Returns the compound words for the given word, if any.
+     *
+     * @param word the word to analyze
+     * @return the list of compound words, or empty if none
+     */
     public static ImmutableList<Word> getCompoundWords(Word word) {
         var deps = Lists.mutable.of(word);
         deps.addAll(word.getOutgoingDependencyWordsWithType(DependencyTag.COMPOUND).toList());
@@ -344,11 +350,10 @@ public final class CommonUtilities {
     }
 
     /**
-     * Check if the word is CamelCased. Additionally, the word needs to have a length > 4, otherwise it is probably only
-     * a abbreviation.
+     * Check if the word is CamelCased. Additionally, the word needs to have a length > 4, otherwise it is probably only an abbreviation.
      *
      * @param word Word to check
-     * @return <code>true</code> if the word is CamelCased and has a length greater than 4
+     * @return true if the word is CamelCased and has a length greater than 4
      */
     public static boolean isCamelCasedWord(String word) {
         if (word.toUpperCase().equals(word)) {
@@ -358,8 +363,7 @@ public final class CommonUtilities {
     }
 
     /**
-     * Checks a given list of {@link Word words} to find out if there are words that the given recommendedInstance has
-     * in its {@link NounMapping NounMappings}.
+     * Checks a given list of {@link Word words} to find out if there are words that the given recommendedInstance has in its {@link NounMapping NounMappings}.
      *
      * @param wordList            the word list to check
      * @param recommendedInstance the RecommendedInstance in question
@@ -385,7 +389,7 @@ public final class CommonUtilities {
     }
 
     /**
-     * Reads text from the {@link InputStream} into a String
+     * Reads text from the {@link InputStream} into a String.
      *
      * @param text the input stream
      * @return the text as String
@@ -399,7 +403,7 @@ public final class CommonUtilities {
     }
 
     /**
-     * Reads the contents of a File into a String
+     * Reads the contents of a File into a String.
      *
      * @param textFile the file to be read
      * @return the content of the File as String
@@ -412,4 +416,5 @@ public final class CommonUtilities {
             return "";
         }
     }
+
 }

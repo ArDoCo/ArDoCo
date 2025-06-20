@@ -7,24 +7,25 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.CodeModel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItemRepository;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.CodeExtractor;
 
 public final class ShellExtractor extends CodeExtractor {
 
-    private CodeModel extractedModel = null;
+    private CodeModel codeModel;
 
-    public ShellExtractor(CodeItemRepository codeItemRepository, String path) {
-        super(codeItemRepository, path);
+    public ShellExtractor(CodeItemRepository codeItemRepository, String path, Metamodel metamodelToExtract) {
+        super(codeItemRepository, path, metamodelToExtract);
     }
 
     @Override
     public synchronized CodeModel extractModel() {
-        if (extractedModel == null) {
-            this.extractedModel = parseCode(new File(path));
+        if (codeModel == null) {
+            this.codeModel = parseCode(new File(path));
         }
-        return this.extractedModel;
+        return this.codeModel;
     }
 
     private CodeModel parseCode(File file) {

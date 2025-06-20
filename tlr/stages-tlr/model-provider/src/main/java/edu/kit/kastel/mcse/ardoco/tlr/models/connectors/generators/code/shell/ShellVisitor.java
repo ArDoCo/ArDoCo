@@ -19,6 +19,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.CodeModel;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.CodeModelWithOnlyCompilationUnits;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeCompilationUnit;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItem;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItemRepository;
@@ -41,26 +42,26 @@ public class ShellVisitor implements FileVisitor<Path> {
     }
 
     public CodeModel getCodeModel() {
-        return new CodeModel(codeItemRepository, codeEndpoints);
+        return new CodeModelWithOnlyCompilationUnits(codeItemRepository, codeEndpoints);
     }
 
     @Override
-    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) {
         return FileVisitResult.CONTINUE;
     }
 
     @Override
-    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+    public FileVisitResult postVisitDirectory(Path dir, IOException exc) {
         return FileVisitResult.CONTINUE;
     }
 
     @Override
-    public FileVisitResult visitFileFailed(Path file, IOException exc) throws IOException {
+    public FileVisitResult visitFileFailed(Path file, IOException exc) {
         return FileVisitResult.CONTINUE;
     }
 
     @Override
-    public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) throws IOException {
+    public FileVisitResult visitFile(Path path, BasicFileAttributes attrs) {
         String fileName = path.getFileName().toString();
         String code = "";
         try (FileReader reader = new FileReader(path.toFile())) {

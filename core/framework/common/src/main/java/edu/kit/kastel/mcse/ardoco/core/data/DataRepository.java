@@ -1,6 +1,7 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Optional;
 import java.util.SortedMap;
@@ -10,13 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This class represents a data repository that can be used to store and fetch certain data ({@link PipelineStepData}. Data can be added and fetched with the
- * help of a data identifier (as string). Fetching also needs the necessary class of data that is expected.
+ * Represents a data repository for storing and fetching pipeline step data by identifier.
+ * Data can be added and fetched using a string identifier and the expected class type.
  */
 public class DataRepository implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -3068992658696547744L;
 
+    /**
+     * Logger for data repository operations.
+     */
     private static final Logger logger = LoggerFactory.getLogger(DataRepository.class);
 
     private final SortedMap<String, PipelineStepData> data;
@@ -39,7 +44,7 @@ public class DataRepository implements Serializable {
         if (possibleData != null) {
             return possibleData.asPipelineStepData(clazz);
         }
-        DataRepository.logger.warn("Could not find data for id '{}'", identifier);
+        DataRepository.logger.debug("Could not find data for id '{}'", identifier);
         return Optional.empty();
     }
 

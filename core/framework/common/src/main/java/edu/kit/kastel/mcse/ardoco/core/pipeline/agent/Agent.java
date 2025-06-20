@@ -1,15 +1,15 @@
-/* Licensed under MIT 2022-2023. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.pipeline.agent;
 
 /**
- * An Agent is a {@link Claimant} with an ID
+ * An Agent is a {@link Claimant} with an ID.
  */
 public interface Agent extends Claimant {
 
     /**
-     * Return the id of the agent
+     * Returns the ID of the agent.
      *
-     * @return the id of the agent
+     * @return the ID of the agent
      */
     String getId();
 }

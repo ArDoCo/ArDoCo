@@ -1,6 +1,11 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.textextraction;
 
+import java.util.Arrays;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.factory.SortedMaps;
 import org.eclipse.collections.api.factory.SortedSets;
 import org.eclipse.collections.api.list.ImmutableList;
@@ -8,38 +13,31 @@ import org.eclipse.collections.api.list.MutableList;
 import org.eclipse.collections.api.map.sorted.ImmutableSortedMap;
 import org.eclipse.collections.api.map.sorted.MutableSortedMap;
 import org.eclipse.collections.api.set.sorted.ImmutableSortedSet;
+import org.eclipse.collections.api.set.sorted.MutableSortedSet;
 
 import edu.kit.kastel.mcse.ardoco.core.api.stage.textextraction.MappingKind;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.textextraction.NounMapping;
+import edu.kit.kastel.mcse.ardoco.core.api.stage.textextraction.PhraseMapping;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.textextraction.TextState;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.textextraction.TextStateStrategy;
+import edu.kit.kastel.mcse.ardoco.core.api.text.Phrase;
 import edu.kit.kastel.mcse.ardoco.core.api.text.Word;
 import edu.kit.kastel.mcse.ardoco.core.architecture.Deterministic;
 import edu.kit.kastel.mcse.ardoco.core.common.similarity.SimilarityUtils;
+import edu.kit.kastel.mcse.ardoco.core.common.tuple.Pair;
+import edu.kit.kastel.mcse.ardoco.core.common.util.DataRepositoryHelper;
 import edu.kit.kastel.mcse.ardoco.core.data.Confidence;
+import edu.kit.kastel.mcse.ardoco.core.data.DataRepository;
 import edu.kit.kastel.mcse.ardoco.core.pipeline.agent.Claimant;
 
 @Deterministic
-public abstract class DefaultTextStateStrategy implements TextStateStrategy {
-    protected TextStateImpl textState;
+public final class DefaultTextStateStrategy implements TextStateStrategy {
+    private final TextState textState;
+    private final DataRepository dataRepository;
 
-    protected DefaultTextStateStrategy() {
-        // NOP
-    }
-
-    @Override
-    public void setState(TextState textState) {
-        if (this.textState != null) {
-            throw new IllegalStateException("The text state is already set");
-        }
-        if (!(textState instanceof TextStateImpl)) {
-            throw new IllegalArgumentException("The text state must be an instance of TextStateImpl");
-        }
-        this.textState = (TextStateImpl) textState;
-    }
-
-    public TextStateImpl getTextState() {
-        return this.textState;
+    public DefaultTextStateStrategy(DataRepository dataRepository) {
+        this.dataRepository = Objects.requireNonNull(dataRepository);
+        this.textState = Objects.requireNonNull(DataRepositoryHelper.getTextState(dataRepository));
     }
 
     /**
@@ -62,11 +60,6 @@ public abstract class DefaultTextStateStrategy implements TextStateStrategy {
     }
 
     @Override
-    public ImmutableList<NounMapping> getNounMappingsWithSimilarReference(String reference) {
-        return this.textState.getNounMappings().select(nm -> SimilarityUtils.getInstance().areWordsSimilar(reference, nm.getReference())).toImmutable();
-    }
-
-    @Override
     public NounMapping addNounMapping(ImmutableSortedSet<Word> words, ImmutableSortedMap<MappingKind, Confidence> distribution,
             ImmutableList<Word> referenceWords, ImmutableList<String> surfaceForms, String reference) {
         //Do not add noun mappings to the state, which do not have any claimants
@@ -75,7 +68,7 @@ public abstract class DefaultTextStateStrategy implements TextStateStrategy {
         }
 
         NounMapping nounMapping = this.createNounMappingStateless(words, distribution, referenceWords, surfaceForms, reference);
-        this.getTextState().addNounMappingAddPhraseMapping(nounMapping);
+        this.textState.addNounMapping(nounMapping);
         return nounMapping;
     }
 
@@ -87,51 +80,105 @@ public abstract class DefaultTextStateStrategy implements TextStateStrategy {
         distribution.put(MappingKind.TYPE, new Confidence(DEFAULT_AGGREGATOR));
         var nounMapping = this.createNounMappingStateless(words, distribution.toImmutable(), referenceWords, surfaceForms, reference);
         nounMapping.addKindWithProbability(kind, claimant, probability);
-        this.getTextState().addNounMappingAddPhraseMapping(nounMapping);
+        this.textState.addNounMapping(nounMapping);
         return nounMapping;
     }
 
-    public NounMapping mergeNounMappings(NounMapping nounMapping, MutableList<NounMapping> nounMappingsToMerge, Claimant claimant) {
-        for (NounMapping nounMappingToMerge : nounMappingsToMerge) {
+    @Override
+    public void mergeNounMappings(NounMapping nounMapping, NounMapping textuallyEqualNounMapping, Claimant claimant) {
+        this.mergeNounMappings(nounMapping, textuallyEqualNounMapping, null, null, nounMapping.getKind(), claimant, nounMapping.getProbabilityForKind(
+                nounMapping.getKind()));
 
-            if (!this.textState.getNounMappings().contains(nounMappingToMerge)) {
+    }
 
-                final NounMapping finalNounMappingToMerge = nounMappingToMerge;
-                var fittingNounMappings = this.textState.getNounMappings().select(nm -> nm.getWords().containsAllIterable(finalNounMappingToMerge.getWords()));
-                if (fittingNounMappings.isEmpty()) {
-                    continue;
-                }
-                if (fittingNounMappings.size() != 1) {
-                    throw new IllegalStateException();
-                }
-                nounMappingToMerge = fittingNounMappings.get(0);
-            }
-
-            assert this.textState.getNounMappings().contains(nounMappingToMerge);
-
-            var references = nounMapping.getReferenceWords().toList();
-            references.addAllIterable(nounMappingToMerge.getReferenceWords());
-            this.textState.mergeNounMappings(nounMapping, nounMappingToMerge, claimant, references.toImmutable());
-
-            var mergedWords = SortedSets.mutable.empty();
-            mergedWords.addAllIterable(nounMapping.getWords());
-            mergedWords.addAllIterable(nounMappingToMerge.getWords());
-
-            var mergedNounMapping = this.textState.getNounMappings().select(nm -> nm.getWords().toSortedSet().equals(mergedWords));
-
-            assert (mergedNounMapping.size() == 1);
-
-            nounMapping = mergedNounMapping.get(0);
+    @Override
+    public void mergePhraseMappingsAndNounMappings(PhraseMapping phraseMapping, PhraseMapping similarPhraseMapping,
+            MutableList<Pair<NounMapping, NounMapping>> similarNounMappings, Claimant claimant) {
+        this.mergePhraseMappings(phraseMapping, similarPhraseMapping);
+        for (Pair<NounMapping, NounMapping> nounMappingPair : similarNounMappings) {
+            this.mergeNounMappings(nounMappingPair.first(), nounMappingPair.second(), claimant);
         }
-
-        return nounMapping;
     }
 
-    protected final Confidence putAllConfidencesTogether(Confidence confidence, Confidence confidence1) {
+    private void mergePhraseMappings(PhraseMapping phraseMapping, PhraseMapping similarPhraseMapping) {
+        MutableSortedSet<Phrase> mergedPhrases = phraseMapping.getPhrases().toSortedSet();
+        mergedPhrases.addAll(similarPhraseMapping.getPhrases().toList());
 
+        PhraseMapping mergedPhraseMapping = new PhraseMappingImpl(mergedPhrases.toImmutable());
+        this.textState.addPhraseMapping(mergedPhraseMapping);
+        this.textState.removePhraseMapping(phraseMapping, mergedPhraseMapping);
+        this.textState.removePhraseMapping(similarPhraseMapping, mergedPhraseMapping);
+    }
+
+    private Confidence putAllConfidencesTogether(Confidence confidence, Confidence confidence1) {
         Confidence result = confidence.createCopy();
         result.addAllConfidences(confidence1);
         return result;
+    }
+
+    @Override
+    public NounMapping addNounMapping(Word word, MappingKind kind, Claimant claimant, double probability, ImmutableList<String> surfaceForms) {
+
+        NounMapping disposableNounMapping = new NounMappingImpl(SortedSets.immutable.with(word), kind, claimant, probability, Lists.immutable.with(word),
+                surfaceForms);
+
+        for (var existingNounMapping : this.textState.getNounMappings()) {
+            if (SimilarityUtils.getInstance().areNounMappingsSimilar(disposableNounMapping, existingNounMapping)) {
+
+                return this.mergeNounMappings(existingNounMapping, disposableNounMapping, disposableNounMapping.getReferenceWords(), disposableNounMapping
+                        .getReference(), disposableNounMapping.getKind(), claimant, disposableNounMapping.getProbability());
+            }
+        }
+
+        this.textState.addNounMapping(disposableNounMapping);
+        return disposableNounMapping;
+    }
+
+    @Override
+    public NounMappingImpl mergeNounMappingsStateless(NounMapping firstNounMapping, NounMapping secondNounMapping, ImmutableList<Word> referenceWords,
+            String reference, MappingKind mappingKind, Claimant claimant, double probability) {
+
+        MutableSortedSet<Word> mergedWords = firstNounMapping.getWords().toSortedSet();
+        mergedWords.add(secondNounMapping.getReferenceWords().get(0));
+        //This makes only sense under specific conditions, since it is sequentially dependent. It might be fixed in future versions
+
+        var existingNounMappingDistribution = firstNounMapping.getDistribution();
+        var disposableNounMappingDistribution = secondNounMapping.getDistribution();
+        var mergedRawMap = Arrays.stream(MappingKind.values())
+                .collect(Collectors.toMap( //
+                        kind -> kind, //
+                        kind -> this.putAllConfidencesTogether(existingNounMappingDistribution.get(kind), disposableNounMappingDistribution.get(kind)) //
+                ));
+        MutableSortedMap<MappingKind, Confidence> mergedDistribution = SortedMaps.mutable.withSortedMap(mergedRawMap);
+
+        MutableList<String> mergedSurfaceForms = firstNounMapping.getSurfaceForms().toList();
+        for (var surface : secondNounMapping.getSurfaceForms()) {
+            if (mergedSurfaceForms.contains(surface)) {
+                continue;
+            }
+            mergedSurfaceForms.add(surface);
+        }
+
+        ImmutableList<Word> mergedReferenceWords = firstNounMapping.getReferenceWords();
+
+        String mergedReference = mergedReferenceWords.collect(Word::getText).makeString(" ");
+
+        return new NounMappingImpl(NounMappingImpl.earliestCreationTime(firstNounMapping, secondNounMapping), mergedWords.toSortedSet().toImmutable(),
+                mergedDistribution.toImmutable(), mergedReferenceWords.toImmutable(), mergedSurfaceForms.toImmutable(), mergedReference);
+    }
+
+    @Override
+    public NounMappingImpl mergeNounMappings(NounMapping firstNounMapping, NounMapping secondNounMapping, ImmutableList<Word> referenceWords, String reference,
+            MappingKind mappingKind, Claimant claimant, double probability) {
+        var mergedNounMapping = this.mergeNounMappingsStateless(firstNounMapping, secondNounMapping, referenceWords, reference, mappingKind, claimant,
+                probability);
+
+        // We just need to remove them plain from the state -> no cascade.
+        this.textState.removeNounMapping(this.dataRepository, firstNounMapping, mergedNounMapping, false);
+        this.textState.removeNounMapping(this.dataRepository, secondNounMapping, mergedNounMapping, false);
+
+        this.textState.addNounMapping(mergedNounMapping);
+        return mergedNounMapping;
     }
 
 }

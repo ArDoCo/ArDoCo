@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.textextraction.informants;
 
 import java.util.SortedMap;
@@ -15,11 +15,11 @@ import edu.kit.kastel.mcse.ardoco.core.common.util.CommonUtilities;
 import edu.kit.kastel.mcse.ardoco.core.common.util.DataRepositoryHelper;
 import edu.kit.kastel.mcse.ardoco.core.configuration.Configurable;
 import edu.kit.kastel.mcse.ardoco.core.data.DataRepository;
-import edu.kit.kastel.mcse.ardoco.core.pipeline.agent.Informant;
+import edu.kit.kastel.mcse.ardoco.core.data.DataRepositorySyncer;
 import edu.kit.kastel.mcse.ardoco.tlr.textextraction.NounMappingImpl;
 import edu.kit.kastel.mcse.ardoco.tlr.textextraction.TextStateImpl;
 
-public class CompoundAgentInformant extends Informant {
+public class CompoundAgentInformant extends TextExtractionInformant {
     @Configurable
     private double compoundConfidence = 0.6;
     @Configurable
@@ -31,11 +31,11 @@ public class CompoundAgentInformant extends Informant {
 
     @Override
     public void process() {
-        var text = DataRepositoryHelper.getAnnotatedText(getDataRepository());
-        var textState = getDataRepository().getData(TextState.ID, TextStateImpl.class).orElseThrow();
+        var text = DataRepositoryHelper.getAnnotatedText(this.getDataRepository());
+        var textState = this.getDataRepository().getData(TextState.ID, TextStateImpl.class).orElseThrow();
         for (var word : text.words()) {
-            createNounMappingIfCompoundWord(word, textState);
-            createNounMappingIfSpecialNamedEntity(word, textState);
+            this.createNounMappingIfCompoundWord(word, textState);
+            this.createNounMappingIfSpecialNamedEntity(word);
         }
     }
 
@@ -47,12 +47,12 @@ public class CompoundAgentInformant extends Informant {
             return;
         }
         // add the full compoundWords
-        addCompoundNounMapping(compoundWords, textState);
+        this.addCompoundNounMapping(compoundWords, textState);
 
         // filter NounMappings that are types and add the rest of the compoundWords (if it changed)
-        var filteredCompoundWords = filterWordsOfTypeMappings(compoundWords, textState);
+        var filteredCompoundWords = this.filterWordsOfTypeMappings(compoundWords, textState);
         if (filteredCompoundWords.size() != compoundWords.size() && filteredCompoundWords.size() > 1) {
-            addCompoundNounMapping(filteredCompoundWords, textState);
+            this.addCompoundNounMapping(filteredCompoundWords, textState);
         }
     }
 
@@ -71,20 +71,22 @@ public class CompoundAgentInformant extends Informant {
         var similarReferenceNounMappings = textState.getNounMappingsWithSimilarReference(reference);
         if (similarReferenceNounMappings.isEmpty()) {
 
-            var nounMapping = textState.addNounMapping(compoundWords.toImmutableSortedSet(), MappingKind.NAME, this, compoundConfidence, compoundWords
-                    .toImmutableList(), compoundWords.collect(Word::getText).toImmutableList(), createReferenceForCompound(compoundWords));
+            var nounMapping = this.getTextStateStrategy()
+                    .addNounMapping(compoundWords.toImmutableSortedSet(), MappingKind.NAME, this, this.compoundConfidence, compoundWords.toImmutableList(),
+                            compoundWords.collect(Word::getText).toImmutableList(), createReferenceForCompound(compoundWords));
             ((NounMappingImpl) nounMapping).setIsDefinedAsCompound(true);
         } else {
             for (var nounMapping : similarReferenceNounMappings) {
 
-                textState.removeNounMapping(nounMapping, null);
+                textState.removeNounMapping(this.getDataRepository(), nounMapping, null, true);
 
                 var newWords = nounMapping.getWords().toSortedSet();
                 newWords.addAllIterable(compoundWords);
 
-                var compoundMapping = textState.addNounMapping(newWords.toImmutable(), nounMapping.getDistribution(), nounMapping.getReferenceWords(),
-                        nounMapping.getSurfaceForms(), nounMapping.getReference());
-                nounMapping.onDelete(compoundMapping);
+                var compoundMapping = this.getTextStateStrategy()
+                        .addNounMapping(newWords.toImmutable(), nounMapping.getDistribution(), nounMapping.getReferenceWords(), nounMapping.getSurfaceForms(),
+                                nounMapping.getReference());
+                DataRepositorySyncer.onNounMappingDeletion(this.dataRepository, nounMapping, compoundMapping);
                 ((NounMappingImpl) compoundMapping).setIsDefinedAsCompound(true);
             }
         }
@@ -99,10 +101,10 @@ public class CompoundAgentInformant extends Informant {
         return referenceJoiner.toString();
     }
 
-    private void createNounMappingIfSpecialNamedEntity(Word word, TextState textState) {
+    private void createNounMappingIfSpecialNamedEntity(Word word) {
         var text = word.getText();
         if (CommonUtilities.isCamelCasedWord(text) || CommonUtilities.nameIsSnakeCased(text)) {
-            textState.addNounMapping(word, MappingKind.NAME, this, specialNamedEntityConfidence);
+            this.getTextStateStrategy().addNounMapping(word, MappingKind.NAME, this, this.specialNamedEntityConfidence);
         }
     }
 

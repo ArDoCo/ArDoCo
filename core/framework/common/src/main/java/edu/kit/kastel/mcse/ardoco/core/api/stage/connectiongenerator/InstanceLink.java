@@ -1,6 +1,7 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.stage.connectiongenerator;
 
+import java.io.Serial;
 import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -8,7 +9,9 @@ import java.util.Set;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.MutableList;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.legacy.ModelInstance;
+import edu.kit.kastel.mcse.ardoco.core.api.entity.ArchitectureEntity;
+import edu.kit.kastel.mcse.ardoco.core.api.entity.CodeEntity;
+import edu.kit.kastel.mcse.ardoco.core.api.entity.ModelEntity;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.recommendationgenerator.RecommendedInstance;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.textextraction.NounMapping;
 import edu.kit.kastel.mcse.ardoco.core.api.tracelink.TraceLink;
@@ -18,42 +21,43 @@ import edu.kit.kastel.mcse.ardoco.core.data.Confidence;
 import edu.kit.kastel.mcse.ardoco.core.pipeline.agent.Claimant;
 
 /**
- * An InstanceLink defines a link between an {@link RecommendedInstance} and an {@link ModelInstance}.
+ * Defines a link between a {@link RecommendedInstance} and a {@link ModelEntity}.
  */
 @Deterministic
-public class InstanceLink extends TraceLink<RecommendedInstance, ModelInstance> {
+public final class InstanceLink extends TraceLink<RecommendedInstance, ModelEntity> {
 
+    @Serial
     private static final long serialVersionUID = -8630933950725516269L;
     private final Confidence confidence;
 
     /**
-     * Create a new instance link
+     * Create a new instance link.
      *
      * @param textualInstance the recommended instance
-     * @param modelInstance   the model instance
+     * @param entity          the model instance
      */
-    public InstanceLink(RecommendedInstance textualInstance, ModelInstance modelInstance) {
-        super(textualInstance, modelInstance);
+    public InstanceLink(RecommendedInstance textualInstance, ModelEntity entity) {
+        super(textualInstance, entity);
         this.confidence = new Confidence(AggregationFunctions.AVERAGE);
     }
 
     /**
-     * Creates a new instance link.
+     * Creates a new instance link with a claimant and probability.
      *
      * @param textualInstance the recommended instance
-     * @param modelInstance   the model instance
+     * @param entity          the model instance
      * @param claimant        the claimant
      * @param probability     the probability of this link
      */
-    public InstanceLink(RecommendedInstance textualInstance, ModelInstance modelInstance, Claimant claimant, double probability) {
-        this(textualInstance, modelInstance);
+    public InstanceLink(RecommendedInstance textualInstance, ModelEntity entity, Claimant claimant, double probability) {
+        this(textualInstance, entity);
         this.confidence.addAgentConfidence(claimant, probability);
     }
 
     /**
      * Add confidence to this link.
      *
-     * @param claimant   the claimant that wants to change the confidence
+     * @param claimant   the claimant
      * @param confidence the confidence value to add
      */
     public final void addConfidence(Claimant claimant, double confidence) {
@@ -69,6 +73,11 @@ public class InstanceLink extends TraceLink<RecommendedInstance, ModelInstance> 
         return this.confidence.getConfidence();
     }
 
+    /**
+     * Returns a string representation of this instance link.
+     *
+     * @return string representation
+     */
     @Override
     public String toString() {
         Set<String> names = new LinkedHashSet<>();
@@ -84,8 +93,15 @@ public class InstanceLink extends TraceLink<RecommendedInstance, ModelInstance> 
             types.addAll(typeMapping.getSurfaceForms().castToCollection());
             typePositions.addAll(typeMapping.getMappingSentenceNo().castToCollection());
         }
-        return "InstanceMapping [ uid=" + this.getSecondEndpoint().getUid() + ", name=" + this.getSecondEndpoint().getFullName() + //
-                ", as=" + String.join(", ", this.getSecondEndpoint().getFullType()) + ", probability=" + this.getConfidence() + ", FOUND: " + //
+
+        String typeInfo;
+        switch (this.getSecondEndpoint()) {
+            case ArchitectureEntity architectureEntity -> typeInfo = architectureEntity.getType().orElseThrow();
+            case CodeEntity ignored -> typeInfo = "";
+        }
+
+        return "InstanceMapping [ uid=" + this.getSecondEndpoint().getId() + ", name=" + this.getSecondEndpoint().getName() + //
+                ", as=" + String.join(", ", typeInfo) + ", probability=" + this.getConfidence() + ", FOUND: " + //
                 this.getFirstEndpoint().getName() + " : " + this.getFirstEndpoint().getType() + ", occurrences= " + //
                 "NameVariants: " + names.size() + ": " + names + " sentences{" + Arrays.toString(namePositions.toArray()) + "}" + //
                 ", TypeVariants: " + types.size() + ": " + types + "sentences{" + Arrays.toString(typePositions.toArray()) + "}" + "]";

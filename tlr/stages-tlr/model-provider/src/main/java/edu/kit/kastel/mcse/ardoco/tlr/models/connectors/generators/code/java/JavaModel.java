@@ -1,44 +1,17 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.java;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
+import java.util.*;
 
 import org.apache.commons.io.FilenameUtils;
-import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.AbstractTypeDeclaration;
-import org.eclipse.jdt.core.dom.BodyDeclaration;
-import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.jdt.core.dom.EnumDeclaration;
-import org.eclipse.jdt.core.dom.ITypeBinding;
-import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.dom.Name;
-import org.eclipse.jdt.core.dom.PackageDeclaration;
-import org.eclipse.jdt.core.dom.QualifiedName;
-import org.eclipse.jdt.core.dom.SimpleName;
-import org.eclipse.jdt.core.dom.Type;
-import org.eclipse.jdt.core.dom.TypeDeclaration;
+import org.eclipse.jdt.core.dom.*;
 
+import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.CodeModel;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.ClassUnit;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeCompilationUnit;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItem;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItemRepository;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeModule;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodePackage;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.ControlElement;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.Datatype;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.InterfaceUnit;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.ProgrammingLanguages;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.CodeModelWithCompilationUnitsAndPackages;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.CodeModelWithOnlyCompilationUnits;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.*;
 import edu.kit.kastel.mcse.ardoco.core.architecture.Deterministic;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.java.finder.EnumDeclarationFinder;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.java.finder.MethodDeclarationFinder;
@@ -49,21 +22,28 @@ import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.java.fin
 public final class JavaModel {
 
     private final CodeItemRepository codeItemRepository;
-    private Set<JavaType> javaTypes;
-    private Set<JavaClassifier> javaClassifiers;
-    private Set<JavaInterface> javaInterfaces;
-    private CodeModel codeModel;
+    private final SortedSet<CodeItem> content;
+    private final Set<JavaType> javaTypes;
+    private final Set<JavaClassifier> javaClassifiers;
+    private final Set<JavaInterface> javaInterfaces;
+    private CodeModelWithOnlyCompilationUnits codeModel;
 
     public JavaModel(CodeItemRepository codeItemRepository, SortedMap<String, CompilationUnit> compUnitMap) {
         this.codeItemRepository = codeItemRepository;
+        this.content = new TreeSet<>();
         javaTypes = new LinkedHashSet<>();
         javaClassifiers = new LinkedHashSet<>();
         javaInterfaces = new LinkedHashSet<>();
         initModel(compUnitMap);
     }
 
-    public CodeModel getCodeModel() {
-        return codeModel;
+    public CodeModel getCodeModel(Metamodel representation) {
+        return switch (representation) {
+            case CODE_WITH_COMPILATION_UNITS_AND_PACKAGES -> new CodeModelWithCompilationUnitsAndPackages(codeItemRepository, content);
+            case CODE_ONLY_COMPILATION_UNITS -> codeModel;
+            default -> throw new IllegalArgumentException("Unsupported metamodel: " + representation);
+        };
+
     }
 
     private void addType(Datatype codeType, AbstractTypeDeclaration abstractTypeDeclaration) {
@@ -184,7 +164,7 @@ public final class JavaModel {
     //
 
     private void initModel(SortedMap<String, CompilationUnit> compUnitMap) {
-        SortedSet<CodeItem> modelContent = new TreeSet<>();
+
         SortedSet<CodePackage> codePackages = new TreeSet<>();
         SortedSet<CodeCompilationUnit> codeCompilationUnits = new TreeSet<>();
 
@@ -211,7 +191,7 @@ public final class JavaModel {
                 CodePackage codePackage = getPackage(packageNames, codeCompilationUnit);
                 codePackages.add(codePackage);
             } else {
-                modelContent.add(codeCompilationUnit);
+                content.add(codeCompilationUnit);
             }
             List<Datatype> types = extractTypes(compilationUnit);
             types.forEach(t -> t.setCompilationUnit(codeCompilationUnit));
@@ -224,9 +204,9 @@ public final class JavaModel {
         initSuperclasses();
         initDependencies();
 
-        modelContent.addAll(mergedCodePackages);
+        content.addAll(mergedCodePackages);
 
-        codeModel = new CodeModel(codeItemRepository, modelContent);
+        codeModel = new CodeModelWithOnlyCompilationUnits(codeItemRepository, content);
     }
 
     private List<Datatype> extractTypes(CompilationUnit compilationUnit) {

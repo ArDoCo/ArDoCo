@@ -1,6 +1,7 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.text.providers.informants.corenlp;
 
+import java.io.Serial;
 import java.util.Comparator;
 import java.util.Objects;
 
@@ -22,6 +23,8 @@ import edu.stanford.nlp.trees.Tree;
 @Deterministic
 public class PhraseImpl implements Phrase {
 
+    @Serial
+    private static final long serialVersionUID = 4504339547271582240L;
     private final Tree tree;
     private final MutableList<Word> words;
 
@@ -36,8 +39,8 @@ public class PhraseImpl implements Phrase {
     }
 
     @Override
-    public int getSentenceNo() {
-        return words.getFirst().getSentenceNo();
+    public int getSentenceNumber() {
+        return words.getFirst().getSentenceNumber();
     }
 
     @Override
@@ -60,7 +63,7 @@ public class PhraseImpl implements Phrase {
     }
 
     @Override
-    public ImmutableList<Phrase> getSubPhrases() {
+    public ImmutableList<Phrase> getSubphrases() {
         MutableList<Phrase> subPhrases = Lists.mutable.empty();
         for (var subTree : tree) {
             if (subTree.isPhrasal() && tree.dominates(subTree)) {
@@ -73,7 +76,7 @@ public class PhraseImpl implements Phrase {
     }
 
     @Override
-    public boolean isSuperPhraseOf(Phrase other) {
+    public boolean isSuperphraseOf(Phrase other) {
         if (other instanceof PhraseImpl otherPhrase) {
             return tree.dominates(otherPhrase.tree);
         } else {
@@ -84,7 +87,7 @@ public class PhraseImpl implements Phrase {
     }
 
     @Override
-    public boolean isSubPhraseOf(Phrase other) {
+    public boolean isSubphraseOf(Phrase other) {
         if (other instanceof PhraseImpl otherPhrase) {
             return otherPhrase.tree.dominates(this.tree);
         } else {
@@ -106,7 +109,7 @@ public class PhraseImpl implements Phrase {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this.getSentenceNo(), this.getText(), this.getPhraseType(), this.getContainedWords().get(0).getPosition());
+        return Objects.hash(this.getSentenceNumber(), this.getText(), this.getPhraseType(), this.getContainedWords().get(0).getPosition());
     }
 
     @Override
@@ -115,8 +118,8 @@ public class PhraseImpl implements Phrase {
             return true;
         if (!(obj instanceof Phrase other))
             return false;
-        return this.getSentenceNo() == other.getSentenceNo() && Objects.equals(this.getText(), other.getText()) && Objects.equals(this.getPhraseType(), other
-                .getPhraseType()) && this.getContainedWords().get(0).getPosition() == other.getContainedWords().get(0).getPosition();
+        return this.getSentenceNumber() == other.getSentenceNumber() && Objects.equals(this.getText(), other.getText()) && Objects.equals(this.getPhraseType(),
+                other.getPhraseType()) && this.getContainedWords().get(0).getPosition() == other.getContainedWords().get(0).getPosition();
     }
 
     @Override
@@ -128,7 +131,7 @@ public class PhraseImpl implements Phrase {
     public int compareTo(Phrase o) {
         if (this == o)
             return 0;
-        return Comparator.comparing(Phrase::getSentenceNo)
+        return Comparator.comparing(Phrase::getSentenceNumber)
                 .thenComparing(Phrase::getText)
                 .thenComparing(Phrase::getPhraseType)
                 .thenComparingInt(p -> p.getContainedWords().get(0).getPosition())

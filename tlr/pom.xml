@@ -83,18 +83,6 @@
     <aggregate.report.dir>report/target/site/jacoco-aggregate/jacoco.xml</aggregate.report.dir>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.google.errorprone</groupId>
-      <artifactId>error_prone_core</artifactId>
-      <version>${error-prone.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-api</artifactId>
-      <version>${slf4j.version}</version>
-    </dependency>
-  </dependencies>
   <repositories>
     <repository>
       <id>mavenCentral</id>

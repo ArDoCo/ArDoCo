@@ -1,4 +1,4 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.tests.integration;
 
 import static edu.kit.kastel.mcse.ardoco.tlr.tests.integration.TraceLinkEvaluationIT.OUTPUT;
@@ -10,7 +10,7 @@ import org.eclipse.collections.api.list.ImmutableList;
 import org.junit.jupiter.api.MethodOrderer;
 import org.junit.jupiter.api.TestMethodOrder;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.ArchitectureModelType;
+import edu.kit.kastel.mcse.ardoco.core.api.models.ModelFormat;
 import edu.kit.kastel.mcse.ardoco.core.api.output.ArDoCoResult;
 import edu.kit.kastel.mcse.ardoco.core.common.util.TraceLinkUtilities;
 import edu.kit.kastel.mcse.ardoco.core.execution.ConfigurationHelper;
@@ -26,12 +26,6 @@ import edu.kit.kastel.mcse.ardoco.tlr.execution.ArDoCoForSadSamTraceabilityLinkR
 public class SadSamTraceabilityLinkRecoveryEvaluation<T extends GoldStandardProject> extends TraceabilityLinkRecoveryEvaluation<T> {
 
     @Override
-    protected boolean resultHasRequiredData(ArDoCoResult arDoCoResult) {
-        var traceLinks = arDoCoResult.getAllTraceLinks();
-        return !traceLinks.isEmpty();
-    }
-
-    @Override
     protected ArDoCoRunner getAndSetupRunner(T project) {
         var additionalConfigsMap = ConfigurationHelper.loadAdditionalConfigs(project.getAdditionalConfigurationsFile());
 
@@ -41,7 +35,7 @@ public class SadSamTraceabilityLinkRecoveryEvaluation<T extends GoldStandardProj
         File outputDir = new File(OUTPUT);
 
         var runner = new ArDoCoForSadSamTraceabilityLinkRecovery(name);
-        runner.setUp(inputText, inputModel, ArchitectureModelType.PCM, additionalConfigsMap, outputDir);
+        runner.setUp(inputText, inputModel, ModelFormat.PCM, additionalConfigsMap, outputDir);
         return runner;
     }
 
@@ -62,7 +56,7 @@ public class SadSamTraceabilityLinkRecoveryEvaluation<T extends GoldStandardProj
 
     @Override
     protected ImmutableList<String> createTraceLinkStringList(ArDoCoResult arDoCoResult) {
-        var sadSamTls = Lists.immutable.ofAll(arDoCoResult.getAllTraceLinks());
+        var sadSamTls = Lists.immutable.ofAll(arDoCoResult.getArchitectureTraceLinks());
         return TraceLinkUtilities.getSadSamTraceLinksAsStringList(sadSamTls);
     }
 
@@ -70,20 +64,19 @@ public class SadSamTraceabilityLinkRecoveryEvaluation<T extends GoldStandardProj
     protected int getConfusionMatrixSum(ArDoCoResult arDoCoResult) {
         int sentences = arDoCoResult.getText().getSentences().size();
         int modelElements = 0;
-        for (var model : arDoCoResult.getModelIds()) {
-            modelElements += arDoCoResult.getModelState(model).getInstances().size();
+        for (var model : arDoCoResult.getMetamodels()) {
+            modelElements += arDoCoResult.getModelState(model).getEndpoints().size();
         }
 
         return sentences * modelElements;
     }
 
-    protected ArDoCoResult getArDoCoResult(String name, File inputText, File inputModel, ArchitectureModelType architectureModelType,
-            File additionalConfigurations) {
+    protected ArDoCoResult getArDoCoResult(String name, File inputText, File inputModel, ModelFormat modelFormat, File additionalConfigurations) {
         var additionalConfigsMap = ConfigurationHelper.loadAdditionalConfigs(additionalConfigurations);
         File outputDir = new File(OUTPUT);
 
         var runner = new ArDoCoForSadSamTraceabilityLinkRecovery(name);
-        runner.setUp(inputText, inputModel, architectureModelType, additionalConfigsMap, outputDir);
+        runner.setUp(inputText, inputModel, modelFormat, additionalConfigsMap, outputDir);
         return runner.run();
     }
 }

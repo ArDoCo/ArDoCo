@@ -1,22 +1,20 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.textextraction.informants;
 
 import java.util.SortedMap;
 
 import edu.kit.kastel.mcse.ardoco.core.api.stage.textextraction.MappingKind;
-import edu.kit.kastel.mcse.ardoco.core.api.stage.textextraction.TextState;
 import edu.kit.kastel.mcse.ardoco.core.api.text.DependencyTag;
 import edu.kit.kastel.mcse.ardoco.core.api.text.Word;
 import edu.kit.kastel.mcse.ardoco.core.common.util.DataRepositoryHelper;
 import edu.kit.kastel.mcse.ardoco.core.common.util.WordHelper;
 import edu.kit.kastel.mcse.ardoco.core.configuration.Configurable;
 import edu.kit.kastel.mcse.ardoco.core.data.DataRepository;
-import edu.kit.kastel.mcse.ardoco.core.pipeline.agent.Informant;
 
 /**
  * The analyzer examines the incoming dependency arcs of the current node.
  */
-public class InDepArcsInformant extends Informant {
+public class InDepArcsInformant extends TextExtractionInformant {
 
     @Configurable
     private double nameOrTypeWeight = 0.5;
@@ -35,38 +33,37 @@ public class InDepArcsInformant extends Informant {
 
     @Override
     public void process() {
-        var textState = DataRepositoryHelper.getTextState(getDataRepository());
-        for (var word : DataRepositoryHelper.getAnnotatedText(getDataRepository()).words()) {
-            exec(textState, word);
+        for (var word : DataRepositoryHelper.getAnnotatedText(this.getDataRepository()).words()) {
+            this.exec(word);
         }
     }
 
-    private void exec(TextState textState, Word word) {
+    private void exec(Word word) {
         var nodeValue = word.getText();
         if (nodeValue.length() == 1 && !Character.isLetter(nodeValue.charAt(0))) {
             return;
         }
-        examineIncomingDepArcs(textState, word);
+        this.examineIncomingDepArcs(word);
     }
 
     /**
-     * Examines the incoming dependency arcs from the PARSE graph.
+     * Examines the incoming dependency arcs.
      */
-    private void examineIncomingDepArcs(TextState textState, Word word) {
+    private void examineIncomingDepArcs(Word word) {
 
         var incomingDepArcs = WordHelper.getIncomingDependencyTags(word);
 
         for (DependencyTag depTag : incomingDepArcs) {
             if (hasNameOrTypeDependencies(depTag)) {
-                textState.addNounMapping(word, MappingKind.NAME, this, probability * nameOrTypeWeight);
-                textState.addNounMapping(word, MappingKind.TYPE, this, probability * nameOrTypeWeight);
+                this.getTextStateStrategy().addNounMapping(word, MappingKind.NAME, this, this.probability * this.nameOrTypeWeight);
+                this.getTextStateStrategy().addNounMapping(word, MappingKind.TYPE, this, this.probability * this.nameOrTypeWeight);
             } else if (hasTypeOrNameOrTypeDependencies(depTag)) {
                 if (WordHelper.hasIndirectDeterminerAsPreWord(word)) {
-                    textState.addNounMapping(word, MappingKind.TYPE, this, probability);
+                    this.getTextStateStrategy().addNounMapping(word, MappingKind.TYPE, this, this.probability);
                 }
 
-                textState.addNounMapping(word, MappingKind.NAME, this, probability * nameOrTypeWeight);
-                textState.addNounMapping(word, MappingKind.TYPE, this, probability * nameOrTypeWeight);
+                this.getTextStateStrategy().addNounMapping(word, MappingKind.NAME, this, this.probability * this.nameOrTypeWeight);
+                this.getTextStateStrategy().addNounMapping(word, MappingKind.TYPE, this, this.probability * this.nameOrTypeWeight);
             }
         }
     }

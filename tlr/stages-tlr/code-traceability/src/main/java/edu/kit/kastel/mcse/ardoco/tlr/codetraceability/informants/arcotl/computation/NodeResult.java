@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.codetraceability.informants.arcotl.computation;
 
 import java.util.LinkedHashMap;
@@ -13,13 +13,13 @@ import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.ArchitectureModel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.CodeModel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.architecture.ArchitectureItem;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeCompilationUnit;
-import edu.kit.kastel.mcse.ardoco.core.api.tracelink.SamCodeTraceLink;
+import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItem;
+import edu.kit.kastel.mcse.ardoco.core.api.stage.codetraceability.ModelCodeTraceLink;
 import edu.kit.kastel.mcse.ardoco.core.architecture.Deterministic;
 import edu.kit.kastel.mcse.ardoco.core.common.tuple.Pair;
 
 /**
- * The result of a computation node. A computation node's final result are the
- * calculated {@link Confidence confidences} of every endpoint tuple.
+ * The result of a computation node. A computation node's final result are the calculated {@link Confidence confidences} of every endpoint tuple.
  */
 @Deterministic
 public class NodeResult {
@@ -27,9 +27,8 @@ public class NodeResult {
     private final Map<Pair<ArchitectureItem, CodeCompilationUnit>, Confidence> confidenceMap;
 
     /**
-     * Creates a new computation node result. It is initially empty, so the
-     * confidences of the endpoint tuples still need to be added after they have
-     * been calculated.
+     * Creates a new computation node result. It is initially empty, so the confidences of the endpoint tuples still need to be added after they have been
+     * calculated.
      */
     public NodeResult() {
         this.confidenceMap = new LinkedHashMap<>();
@@ -44,12 +43,10 @@ public class NodeResult {
     }
 
     /**
-     * Returns the calculated {@link Confidence confidence} of the specified
-     * endpoint tuple. Returns null if no confidence for the specified endpoint
-     * tuple has been calculated and added to this result yet.
+     * Returns the calculated {@link Confidence confidence} of the specified endpoint tuple. Returns null if no confidence for the specified endpoint tuple has
+     * been calculated and added to this result yet.
      *
-     * @param endpointTuple the endpoint tuple for which the confidence is to be
-     *                      returned
+     * @param endpointTuple the endpoint tuple for which the confidence is to be returned
      * @return the confidence of the endpoint tuple, or null if it doesn't exist yet
      */
     public Confidence getConfidence(Pair<ArchitectureItem, CodeCompilationUnit> endpointTuple) {
@@ -93,22 +90,20 @@ public class NodeResult {
     }
 
     /**
-     * Returns trace links based on this computation node result. Every endpoint
-     * tuple for which a confidence has been calculated and added to this result
-     * gets considered. Only returns a trace link for an endpoint tuple if its
-     * confidence has a value.
+     * Returns trace links based on this computation node result. Every endpoint tuple for which a confidence has been calculated and added to this result gets
+     * considered. Only returns a trace link for an endpoint tuple if its confidence has a value.
      *
      * @return trace links for every endpoint tuple whose confidence has a value
      */
-    public Set<SamCodeTraceLink> getTraceLinks() {
-        Set<SamCodeTraceLink> traceLinks = new LinkedHashSet<>();
+    public Set<ModelCodeTraceLink> getTraceLinks() {
+        Set<ModelCodeTraceLink> traceLinks = new LinkedHashSet<>();
         for (var entry : this.confidenceMap.entrySet()) {
             Confidence confidence = entry.getValue();
             if (confidence.hasValue()) {
                 Pair<ArchitectureItem, CodeCompilationUnit> endpointTuple = entry.getKey();
                 ArchitectureItem architectureEndpoint = endpointTuple.first();
-                CodeCompilationUnit codeEndpoint = endpointTuple.second();
-                traceLinks.add(new SamCodeTraceLink(architectureEndpoint, codeEndpoint));
+                CodeItem codeEndpoint = endpointTuple.second();
+                traceLinks.add(new ModelCodeTraceLink(architectureEndpoint, codeEndpoint));
             }
         }
         return traceLinks;
@@ -152,8 +147,7 @@ public class NodeResult {
     }
 
     /**
-     * Adds the calculated {@link Confidence confidence} of the specified endpoint
-     * tuple.
+     * Adds the calculated {@link Confidence confidence} of the specified endpoint tuple.
      *
      * @param endpointTuple the endpoint tuple whose confidence is to be added
      * @param confidence    the confidence of the endpoint tuple

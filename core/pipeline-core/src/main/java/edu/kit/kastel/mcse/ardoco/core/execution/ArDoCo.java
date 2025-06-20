@@ -1,4 +1,4 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.core.execution;
 
 import java.io.File;
@@ -16,7 +16,7 @@ import edu.kit.kastel.mcse.ardoco.core.data.ProjectPipelineData;
 import edu.kit.kastel.mcse.ardoco.core.pipeline.Pipeline;
 
 /**
- * The Pipeline defines the execution of the agents.
+ * The Pipeline defines and manages the execution of agents.
  */
 public final class ArDoCo extends Pipeline {
 
@@ -25,7 +25,7 @@ public final class ArDoCo extends Pipeline {
     private final String projectName;
 
     /**
-     * Default constructor to adhere simplify tests that do not care about the project's name. Additionally, it is needed for testing the configurations
+     * Default constructor to simplify tests that do not require the project's name. Also needed for testing configurations.
      */
     @SuppressWarnings("unused")
     private ArDoCo() {
@@ -33,8 +33,8 @@ public final class ArDoCo extends Pipeline {
     }
 
     /**
-     * Creates a new instance of ArDoCo. The provided name should be the project's name and will be used to identify spots within the text where the project is
-     * mentioned.
+     * Creates a new instance of ArDoCo. The provided name should be the project's name and will be used to identify locations within the text where the project
+     * is mentioned.
      *
      * @param projectName the project's name
      */
@@ -42,16 +42,6 @@ public final class ArDoCo extends Pipeline {
         super("ArDoCo", new DataRepository());
         this.projectName = projectName;
         this.initDataRepository();
-    }
-
-    /**
-     * Returns a new instance of this class based with the given project name
-     *
-     * @param projectName the project name
-     * @return a new instance of ArDoCo
-     */
-    public static ArDoCo getInstance(String projectName) {
-        return new ArDoCo(projectName);
     }
 
     private void initDataRepository() {
@@ -64,6 +54,12 @@ public final class ArDoCo extends Pipeline {
         return super.getDataRepository();
     }
 
+    /**
+     * Runs the ArDoCo pipeline and saves the results to the specified output directory.
+     *
+     * @param outputDir the directory where output files should be saved
+     * @return the ArDoCo result containing all analysis data, or null if the pipeline is not properly initialized
+     */
     public ArDoCoResult runAndSave(File outputDir) {
         classLogger.info("Starting {}", this.projectName);
 

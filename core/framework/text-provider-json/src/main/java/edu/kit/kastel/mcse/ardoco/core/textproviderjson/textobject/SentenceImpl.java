@@ -1,6 +1,7 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.textproviderjson.textobject;
 
+import java.io.Serial;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -15,6 +16,8 @@ import edu.kit.kastel.mcse.ardoco.core.api.text.Word;
 
 public class SentenceImpl implements Sentence {
 
+    @Serial
+    private static final long serialVersionUID = 949740708112053162L;
     private final MutableList<Word> words;
     private MutableList<Phrase> phrases = Lists.mutable.empty();
 
@@ -51,7 +54,7 @@ public class SentenceImpl implements Sentence {
     public ImmutableList<Phrase> getPhrases() {
         List<Phrase> allPhrases = new ArrayList<>(this.phrases.toList());
         for (Phrase phrase : this.phrases.toList()) {
-            allPhrases.addAll(phrase.getSubPhrases().toList());
+            allPhrases.addAll(phrase.getSubphrases().toList());
         }
         return Lists.immutable.ofAll(allPhrases);
     }

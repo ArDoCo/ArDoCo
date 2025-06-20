@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.tests.integration;
 
 import java.util.Arrays;
@@ -71,8 +71,6 @@ class TraceLinkEvaluationIT<T extends GoldStandardProject> {
         var evaluation = new SadSamCodeTraceabilityLinkRecoveryEvaluation(true);
         var results = evaluation.runTraceLinkEvaluation(codeProject);
         Assertions.assertNotNull(results);
-
-        TraceabilityLinkRecoveryEvaluation.resultMap.put(codeProject, results);
     }
 
     @DisplayName("Evaluate SAM-Code TLR")

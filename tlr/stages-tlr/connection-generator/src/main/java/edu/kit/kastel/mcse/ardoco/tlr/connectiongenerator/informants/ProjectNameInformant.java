@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.connectiongenerator.informants;
 
 import java.util.Objects;
@@ -9,7 +9,6 @@ import java.util.function.UnaryOperator;
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.MutableList;
 
-import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.recommendationgenerator.RecommendationState;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.recommendationgenerator.RecommendedInstance;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.textextraction.NounMapping;
@@ -21,8 +20,7 @@ import edu.kit.kastel.mcse.ardoco.core.data.DataRepository;
 import edu.kit.kastel.mcse.ardoco.core.pipeline.agent.Informant;
 
 /**
- * This informant looks for (parts of) the project's name within RecommendedInstances and if it finds the project's name, influences the
- * probability of the
+ * This informant looks for (parts of) the project's name within RecommendedInstances and if it finds the project's name, influences the probability of the
  * RecommendedInstance negatively because it then should not be a recommended instance.
  */
 public class ProjectNameInformant extends Informant {
@@ -40,15 +38,18 @@ public class ProjectNameInformant extends Informant {
         super("ProjectNameExtractor", dataRepository);
     }
 
+    private static String getEditedProjectName(String projectName) {
+        // remove white spaces from project name
+        return projectName.replace(" ", "");
+    }
+
     @Override
     public void process() {
         DataRepository dataRepository = this.getDataRepository();
         var projectName = DataRepositoryHelper.getProjectPipelineData(dataRepository).getProjectName();
         var modelStates = DataRepositoryHelper.getModelStatesData(dataRepository);
         var recommendationStates = DataRepositoryHelper.getRecommendationStates(dataRepository);
-        for (var model : modelStates.modelIds()) {
-            var modelState = modelStates.getModelExtractionState(model);
-            Metamodel metamodel = modelState.getMetamodel();
+        for (var metamodel : modelStates.getMetamodels()) {
             var recommendationState = recommendationStates.getRecommendationState(metamodel);
 
             this.checkForProjectNameInRecommendedInstances(projectName, recommendationState);
@@ -138,11 +139,6 @@ public class ProjectNameInformant extends Informant {
             }
             testWordText = concatenation.apply(testWordText, wordText);
         }
-    }
-
-    private static String getEditedProjectName(String projectName) {
-        // remove white spaces from project name
-        return projectName.replace("\s", "");
     }
 
     @Override

@@ -1,6 +1,7 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.core.textproviderjson.textobject;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -8,6 +9,7 @@ import edu.kit.kastel.mcse.ardoco.core.api.text.DependencyTag;
 
 public class DependencyImpl implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = -6941672414051586496L;
     private final DependencyTag dependencyType;
     private final long wordId;

@@ -1,4 +1,4 @@
-/* Licensed under MIT 2021-2023. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.util;
 
 import org.eclipse.collections.api.factory.Lists;
@@ -9,7 +9,7 @@ import edu.kit.kastel.mcse.ardoco.core.api.text.POSTag;
 import edu.kit.kastel.mcse.ardoco.core.api.text.Word;
 
 /**
- * The Class WordHelper contains some helper methods to work with words.
+ * Helper class with static methods for working with words and their linguistic properties.
  */
 public final class WordHelper {
 
@@ -65,26 +65,56 @@ public final class WordHelper {
         return Lists.immutable.with(DependencyTag.values()).select(d -> !word.getOutgoingDependencyWordsWithType(d).isEmpty());
     }
 
+    /**
+     * Checks if the word is a verb based on its POS tag.
+     *
+     * @param word the word
+     * @return true if the word is a verb, false otherwise
+     */
     public static boolean isVerb(Word word) {
         String tag = word.getPosTag().getTag();
         return tag.startsWith("VB") || tag.startsWith("MD");
     }
 
+    /**
+     * Checks if the word is an adjective based on its POS tag.
+     *
+     * @param word the word
+     * @return true if the word is an adjective, false otherwise
+     */
     public static boolean isAdjective(Word word) {
         String tag = word.getPosTag().getTag();
         return tag.startsWith("JJ");
     }
 
+    /**
+     * Checks if the word is an adverb based on its POS tag.
+     *
+     * @param word the word
+     * @return true if the word is an adverb, false otherwise
+     */
     public static boolean isAdverb(Word word) {
         String tag = word.getPosTag().getTag();
         return tag.startsWith("RB");
     }
 
+    /**
+     * Checks if the word is a noun based on its POS tag.
+     *
+     * @param word the word
+     * @return true if the word is a noun, false otherwise
+     */
     public static boolean isNoun(Word word) {
         String tag = word.getPosTag().getTag();
         return tag.startsWith("NN");
     }
 
+    /**
+     * Checks if the word is a pronoun based on its POS tag.
+     *
+     * @param word the word
+     * @return true if the word is a pronoun, false otherwise
+     */
     public static boolean isPronoun(Word word) {
         String tag = word.getPosTag().getTag();
         return tag.startsWith("PR") || tag.startsWith("WP");

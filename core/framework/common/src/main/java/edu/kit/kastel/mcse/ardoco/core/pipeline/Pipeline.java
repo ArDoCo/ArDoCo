@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.pipeline;
 
 import java.time.Duration;
@@ -10,11 +10,8 @@ import java.util.SortedMap;
 import edu.kit.kastel.mcse.ardoco.core.data.DataRepository;
 
 /**
- * Class that represents a pipeline that can consist of multiple {@link AbstractPipelineStep
- * AbstractPipelineSteps}.
- * Steps are executed consecutively one after another in the order they were added to the
- * pipeline. Execution calls the
- * {@link #process()} method of the different {@link AbstractPipelineStep AbstractPipelineSteps}.
+ * Represents a pipeline consisting of multiple {@link AbstractPipelineStep} steps executed in sequence.
+ * Steps are executed in the order they are added to the pipeline.
  */
 public class Pipeline extends AbstractPipelineStep {
     private final List<AbstractPipelineStep> pipelineSteps;

@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.codetraceability.informants.arcotl.functions.aggregation;
 
 import java.util.ArrayList;
@@ -27,19 +27,14 @@ public abstract class ConfidenceAggregator extends Aggregation {
     }
 
     /**
-     * Returns from each of the specified node results the confidence of the
-     * specified endpoint tuple. The returned confidences have the same order as the
-     * specified node results. Throws an {@code IllegalStateException} if not
-     * all of the specified node results have a calculated confidence for the specified endpoint tuple.
+     * Returns from each of the specified node results the confidence of the specified endpoint tuple. The returned confidences have the same order as the
+     * specified node results. Throws an {@code IllegalStateException} if not all of the specified node results have a calculated confidence for the specified
+     * endpoint tuple.
      *
-     * @param results       the node results for which confidences are to be
-     *                      returned
-     * @param endpointTuple the endpoint tuple for which confidences are to be
-     *                      returned
-     * @return the specified endpoint tuple's confidences from all of the specified
-     *         node results
-     * @throws IllegalStateException if not all of the specified
-     *                               node results have a calculated confidence for the specified endpoint tuple
+     * @param results       the node results for which confidences are to be returned
+     * @param endpointTuple the endpoint tuple for which confidences are to be returned
+     * @return the specified endpoint tuple's confidences from all of the specified node results
+     * @throws IllegalStateException if not all of the specified node results have a calculated confidence for the specified endpoint tuple
      */
     private List<Confidence> getConfidences(List<NodeResult> results, Pair<ArchitectureItem, CodeCompilationUnit> endpointTuple) {
         List<Confidence> confidences = new ArrayList<>();

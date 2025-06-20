@@ -1,8 +1,8 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.similarity.wordsim;
 
 /**
- * A measure that can determine whether two words from a {@link ComparisonContext} are similar.
+ * A measure that determines whether two words from a {@link ComparisonContext} are similar.
  */
 public interface WordSimMeasure {
 
@@ -10,7 +10,7 @@ public interface WordSimMeasure {
      * Evaluates whether the words from the given {@link ComparisonContext} are similar.
      *
      * @param ctx the context containing the words
-     * @return Returns {@code true} if the words are similar.
+     * @return true if the words are similar
      */
     boolean areWordsSimilar(ComparisonContext ctx);
 
@@ -18,7 +18,7 @@ public interface WordSimMeasure {
      * Evaluates how similar the words from the given {@link ComparisonContext} are.
      *
      * @param ctx the context containing the words
-     * @return Similarity in range [0,1]
+     * @return similarity in range [0,1]
      */
     double getSimilarity(ComparisonContext ctx);
 }

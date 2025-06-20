@@ -1,4 +1,4 @@
-/* Licensed under MIT 2023. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.text.providers.informants.corenlp.textprocessor;
 
 import java.io.IOException;
@@ -18,7 +18,7 @@ public final class MicroserviceChecker {
      *
      * @return whether the microservice is available
      */
-    public static boolean isMicroserviceAvailable() throws IOException {
+    public static boolean isMicroserviceAvailable() {
         String requestUrl = ConfigManager.INSTANCE.getMicroserviceUrl() + ConfigManager.INSTANCE.getHealthService();
         try {
             String response = new HttpCommunicator().sendAuthenticatedGetRequest(requestUrl);

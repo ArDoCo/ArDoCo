@@ -1,4 +1,4 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.pipeline;
 
 import java.util.List;
@@ -13,10 +13,8 @@ import edu.kit.kastel.mcse.ardoco.core.data.DataRepository;
 import edu.kit.kastel.mcse.ardoco.core.pipeline.agent.PipelineAgent;
 
 /**
- * This abstract class represents an execution step within ArDoCo. Examples are Text-Extraction, Recommendation-Generator, Connection-Generator, and
- * Inconsistency-Checker.
- * <p>
- * Implementing classes need to implement {@link #initializeState()} that cares for setting up the state for processing.
+ * Abstract class representing an execution stage in ArDoCo, such as Text-Extraction or Recommendation-Generator.
+ * Subclasses must implement {@link #initializeState()} to set up the state for processing.
  */
 public abstract class AbstractExecutionStage extends Pipeline {
     private final MutableList<PipelineAgent> agents;

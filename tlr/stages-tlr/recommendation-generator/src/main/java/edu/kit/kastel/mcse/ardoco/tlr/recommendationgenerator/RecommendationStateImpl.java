@@ -1,5 +1,7 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.recommendationgenerator;
+
+import java.io.Serial;
 
 import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.factory.SortedSets;
@@ -19,8 +21,9 @@ import edu.kit.kastel.mcse.ardoco.core.pipeline.agent.Claimant;
  */
 public class RecommendationStateImpl extends AbstractState implements RecommendationState {
 
+    @Serial
     private static final long serialVersionUID = 3088770775218314854L;
-    private MutableSortedSet<RecommendedInstance> recommendedInstances;
+    private final MutableSortedSet<RecommendedInstance> recommendedInstances;
 
     /**
      * Creates a new recommendation state.
@@ -188,5 +191,12 @@ public class RecommendationStateImpl extends AbstractState implements Recommenda
     @Override
     public ImmutableList<RecommendedInstance> getRecommendedInstancesBySimilarType(String type) {
         return this.recommendedInstances.select(ri -> SimilarityUtils.getInstance().areWordsSimilar(ri.getType(), type)).toImmutableList();
+    }
+
+    @Override
+    public void onNounMappingDeletion(NounMapping nounMapping, NounMapping replacement) {
+        for (RecommendedInstance ri : this.recommendedInstances.toImmutable()) {
+            ri.onNounMappingDeletion(nounMapping, replacement);
+        }
     }
 }

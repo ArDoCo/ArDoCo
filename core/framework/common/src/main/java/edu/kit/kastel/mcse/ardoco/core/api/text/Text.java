@@ -1,4 +1,4 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.core.api.text;
 
 import java.io.Serializable;
@@ -7,28 +7,28 @@ import org.eclipse.collections.api.factory.Lists;
 import org.eclipse.collections.api.list.ImmutableList;
 
 /**
- * This interface defines the representation of a text.
+ * Represents a text document.
  */
 public interface Text extends Serializable {
 
     /**
-     * Gets the length of the text (amount of words).
+     * Returns the length of the text (number of words).
      *
      * @return the length
      */
-    default int getLength() {
+    default int getNumberOfWords() {
         return words().size();
     }
 
     /**
-     * Gets all words of the text (ordered).
+     * Returns all words in the text (ordered).
      *
      * @return the words
      */
     ImmutableList<Word> words();
 
     /**
-     * Gets all phrases of the text (ordered).
+     * Returns all phrases in the text (ordered).
      *
      * @return the phrases
      */
@@ -37,7 +37,7 @@ public interface Text extends Serializable {
     }
 
     /**
-     * Returns the word at the given index
+     * Returns the word at the given index.
      *
      * @param index the index
      * @return the word at the given index
@@ -47,7 +47,7 @@ public interface Text extends Serializable {
     /**
      * Returns the sentences of the text, ordered by appearance.
      *
-     * @return the sentences of the text, ordered by appearance.
+     * @return the sentences
      */
     ImmutableList<Sentence> getSentences();
 }

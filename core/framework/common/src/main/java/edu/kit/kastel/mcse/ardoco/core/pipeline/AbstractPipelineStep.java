@@ -1,13 +1,12 @@
-/* Licensed under MIT 2022-2024. */
+/* Licensed under MIT 2022-2025. */
 package edu.kit.kastel.mcse.ardoco.core.pipeline;
 
 import edu.kit.kastel.mcse.ardoco.core.configuration.AbstractConfigurable;
 import edu.kit.kastel.mcse.ardoco.core.data.DataRepository;
 
 /**
- * This class represents an abstract pipeline step and defines the core functionality. Together
- * with {@link Pipeline} and concrete implementations of this class
- * represents a composite pattern.
+ * Abstract base class for a pipeline step, defining the core execution logic and lifecycle hooks.
+ * Used in combination with {@link Pipeline} and concrete implementations as part of a composite pattern.
  */
 public abstract class AbstractPipelineStep extends AbstractConfigurable {
     protected final String id;

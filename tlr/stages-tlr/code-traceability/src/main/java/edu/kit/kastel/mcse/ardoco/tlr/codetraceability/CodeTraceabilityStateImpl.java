@@ -1,6 +1,7 @@
-/* Licensed under MIT 2023-2024. */
+/* Licensed under MIT 2023-2025. */
 package edu.kit.kastel.mcse.ardoco.tlr.codetraceability;
 
+import java.io.Serial;
 import java.util.Collection;
 import java.util.LinkedHashSet;
 
@@ -10,7 +11,7 @@ import org.eclipse.collections.api.set.ImmutableSet;
 import org.eclipse.collections.impl.factory.Sets;
 
 import edu.kit.kastel.mcse.ardoco.core.api.entity.ArchitectureEntity;
-import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeCompilationUnit;
+import edu.kit.kastel.mcse.ardoco.core.api.entity.ModelEntity;
 import edu.kit.kastel.mcse.ardoco.core.api.stage.codetraceability.CodeTraceabilityState;
 import edu.kit.kastel.mcse.ardoco.core.api.text.SentenceEntity;
 import edu.kit.kastel.mcse.ardoco.core.api.tracelink.TraceLink;
@@ -20,40 +21,32 @@ import edu.kit.kastel.mcse.ardoco.core.data.AbstractState;
 @Deterministic
 public class CodeTraceabilityStateImpl extends AbstractState implements CodeTraceabilityState {
 
-    private MutableList<TraceLink<ArchitectureEntity, CodeCompilationUnit>> samCodeTraceLinks = Lists.mutable.empty();
-    private MutableList<TraceLink<SentenceEntity, CodeCompilationUnit>> transitiveTraceLinks = Lists.mutable.empty();
+    @Serial
+    private static final long serialVersionUID = 8036723521626754832L;
+    private MutableList<TraceLink<? extends ArchitectureEntity, ? extends ModelEntity>> samCodeTraceLinks = Lists.mutable.empty();
+    private MutableList<TraceLink<SentenceEntity, ? extends ModelEntity>> transitiveTraceLinks = Lists.mutable.empty();
 
     public CodeTraceabilityStateImpl() {
         super();
     }
 
     @Override
-    public boolean addSamCodeTraceLink(TraceLink<ArchitectureEntity, CodeCompilationUnit> traceLink) {
-        return this.samCodeTraceLinks.add(traceLink);
-    }
-
-    @Override
-    public boolean addSamCodeTraceLinks(Collection<? extends TraceLink<ArchitectureEntity, CodeCompilationUnit>> traceLinks) {
+    public boolean addSamCodeTraceLinks(Collection<? extends TraceLink<? extends ArchitectureEntity, ? extends ModelEntity>> traceLinks) {
         return this.samCodeTraceLinks.addAll(traceLinks);
     }
 
     @Override
-    public ImmutableSet<TraceLink<ArchitectureEntity, CodeCompilationUnit>> getSamCodeTraceLinks() {
+    public ImmutableSet<TraceLink<? extends ArchitectureEntity, ? extends ModelEntity>> getSamCodeTraceLinks() {
         return Sets.immutable.withAll(new LinkedHashSet<>(this.samCodeTraceLinks));
     }
 
     @Override
-    public boolean addSadCodeTraceLink(TraceLink<SentenceEntity, CodeCompilationUnit> traceLink) {
-        return this.transitiveTraceLinks.add(traceLink);
-    }
-
-    @Override
-    public boolean addSadCodeTraceLinks(Collection<? extends TraceLink<SentenceEntity, CodeCompilationUnit>> traceLinks) {
+    public boolean addSadCodeTraceLinks(Collection<? extends TraceLink<SentenceEntity, ? extends ModelEntity>> traceLinks) {
         return this.transitiveTraceLinks.addAll(traceLinks);
     }
 
     @Override
-    public ImmutableSet<TraceLink<SentenceEntity, CodeCompilationUnit>> getSadCodeTraceLinks() {
+    public ImmutableSet<TraceLink<SentenceEntity, ? extends ModelEntity>> getSadCodeTraceLinks() {
         return this.transitiveTraceLinks.toImmutableSet();
     }
 

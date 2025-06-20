@@ -18,39 +18,47 @@ import org.eclipse.jdt.core.dom.FileASTRequestor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import edu.kit.kastel.mcse.ardoco.core.api.models.Metamodel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.CodeModel;
 import edu.kit.kastel.mcse.ardoco.core.api.models.arcotl.code.CodeItemRepository;
 import edu.kit.kastel.mcse.ardoco.core.architecture.Deterministic;
 import edu.kit.kastel.mcse.ardoco.tlr.models.connectors.generators.code.CodeExtractor;
 
 /**
- * An extractor for Java. Extracts a CMTL instance.
+ * Extractor for Java code. Extracts a CMTL instance.
  */
 @Deterministic
 public final class JavaExtractor extends CodeExtractor {
 
     private static final Logger logger = LoggerFactory.getLogger(JavaExtractor.class);
 
-    private CodeModel extractedModel = null;
+    private CodeModel codeModel;
 
-    public JavaExtractor(CodeItemRepository codeItemRepository, String path) {
-        super(codeItemRepository, path);
+    /**
+     * Creates a new JavaExtractor instance.
+     *
+     * @param codeItemRepository the code item repository
+     * @param path               the path to the code
+     * @param metamodelToExtract the metamodel to extract
+     */
+    public JavaExtractor(CodeItemRepository codeItemRepository, String path, Metamodel metamodelToExtract) {
+        super(codeItemRepository, path, metamodelToExtract);
     }
 
     /**
-     * Extracts a code model, i.e. an CMTL instance, from Java code.
+     * Extracts a code model, i.e. a CMTL instance, from Java code.
      *
      * @return the extracted code model
      */
     @Override
     public synchronized CodeModel extractModel() {
-        if (extractedModel == null) {
+        if (codeModel == null) {
             Path directoryPath = Path.of(path);
             SortedMap<String, CompilationUnit> compUnitMap = parseDirectory(directoryPath);
             JavaModel javaModel = new JavaModel(codeItemRepository, compUnitMap);
-            this.extractedModel = javaModel.getCodeModel();
+            this.codeModel = javaModel.getCodeModel(metamodelToExtract);
         }
-        return this.extractedModel;
+        return this.codeModel;
     }
 
     private static SortedMap<String, CompilationUnit> parseDirectory(Path dir) {

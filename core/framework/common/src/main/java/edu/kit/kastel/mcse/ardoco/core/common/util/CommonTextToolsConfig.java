@@ -1,10 +1,10 @@
-/* Licensed under MIT 2021-2024. */
+/* Licensed under MIT 2021-2025. */
 package edu.kit.kastel.mcse.ardoco.core.common.util;
 
 import org.eclipse.collections.api.list.ImmutableList;
 
 /**
- * The Class CommonTextToolsConfig defines the configuration for the common text tools.
+ * Configuration class for the common text tools, providing constants for similarity and text processing settings.
  */
 public final class CommonTextToolsConfig {
 
@@ -96,14 +96,6 @@ public final class CommonTextToolsConfig {
      * The path to the sqlite database file used by the GloVe word similarity measure.
      */
     public static final String GLOVE_DB_FILE_PATH = CONFIG.getProperty("glove_DatabaseFilePath");
-    /**
-     * The threshold for a diagram element to be considered similar to a noun mapping.
-     */
-    public static final double DE_NM_SIMILARITY_THRESHOLD = CONFIG.getPropertyAsDouble("de_NM_SimilarityThreshold");
-    /**
-     * The threshold for a diagram element to be considered similar to a word.
-     */
-    public static final double DE_WORD_SIMILARITY_THRESHOLD = CONFIG.getPropertyAsDouble("de_Word_SimilarityThreshold");
 
     private static ResourceAccessor loadParameters(String filePath) {
         return new ResourceAccessor(filePath, true);
